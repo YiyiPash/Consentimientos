@@ -1,0 +1,789 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Consentimiento Yiyi Pash</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: una columna de celular (máx. 520px), un paso a la vez. Dos partes: Equipo (gris) y Clienta (rosa), con una pantalla de "pasa el celular" entre ellas. */
+:root{
+  --bg:#fdf2f8; --surface:#ffffff; --fg:#1f2937; --mu:#6b7280; --line:#fbcfe8;
+  --accent:#be185d; --accent2:#ec4899; --soft:#fce7f3; --on-accent:#ffffff;
+  --team:#334155; --team-soft:#e2e8f0;
+  --ok:#15803d; --ok-bg:#dcfce7; --bad:#b91c1c; --warn-bg:#fef3c7; --warn-fg:#92400e;
+  --ink:#1f2937; --paper:#ffffff;
+  --font:'Poppins',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1a1217; --surface:#261a21; --fg:#f7e8f0; --mu:#bca5b2; --line:#4a2a3b;
+  --accent:#f472b6; --accent2:#ec4899; --soft:#3a1d2d; --on-accent:#ffffff;
+  --team:#cbd5e1; --team-soft:#2b3340;
+  --ok:#86efac; --ok-bg:#14301f; --bad:#fca5a5; --warn-bg:#3a2c0e; --warn-fg:#fcd34d;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#1a1217; --surface:#261a21; --fg:#f7e8f0; --mu:#bca5b2; --line:#4a2a3b;
+  --accent:#f472b6; --accent2:#ec4899; --soft:#3a1d2d; --on-accent:#ffffff;
+  --team:#cbd5e1; --team-soft:#2b3340;
+  --ok:#86efac; --ok-bg:#14301f; --bad:#fca5a5; --warn-bg:#3a2c0e; --warn-fg:#fcd34d;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+.app{max-width:520px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.logo{font-size:12px;font-weight:700;letter-spacing:4px;color:var(--accent)}
+.where{font-size:12px;color:var(--mu);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer;font-family:inherit}
+.demo{font-size:11px;font-weight:600;background:var(--warn-bg);color:var(--warn-fg);border-radius:999px;padding:2px 8px}
+.phase{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:999px;padding:3px 10px;margin-top:10px}
+.phase.team{background:var(--team-soft);color:var(--team)}
+.phase.client{background:var(--soft);color:var(--accent)}
+.bar{display:flex;gap:4px;margin-top:8px}
+.bar i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.bar i.on{background:var(--accent)}
+.bar i.team.on{background:var(--team)}
+.stepname{font-size:12px;color:var(--mu);margin-top:6px}
+h1{font-size:22px;font-weight:700;margin:6px 0 4px;text-wrap:balance}
+.hint{font-size:13.5px;color:var(--mu);margin:0 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.card h2{font-size:14px;font-weight:600;color:var(--accent);margin:0}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--mu);letter-spacing:.3px}
+label.f .opc{font-weight:400}
+input[type=text],input[type=tel],input[type=email],input[type=date],input[type=search],input[type=password],select,textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-family:inherit;font-size:16px;color:var(--fg);background:var(--surface);outline:none}
+textarea{min-height:70px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row>*{min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 13px;font-family:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip.none[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex-shrink:0}
+.req{color:var(--accent);font-weight:700}
+.btn{display:block;width:100%;text-align:center;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--on-accent);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn.sec{background:var(--surface);color:var(--accent);border:1.5px solid var(--line)}
+.btn.small{display:inline-block;width:auto;padding:8px 14px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.chip:focus-visible,.where:focus-visible,.zone:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+footer.nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));z-index:5}
+footer.nav .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.err{color:var(--bad);font-size:13.5px;min-height:1px}
+.result{display:flex;gap:12px;align-items:center;justify-content:space-between;border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:var(--surface);width:100%;text-align:left;font-family:inherit;color:var(--fg)}
+.result:hover{border-color:var(--accent)}
+.result b{display:block}
+.result small{color:var(--mu)}
+.pill{font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pill.pink{background:var(--soft);color:var(--accent)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn-fg)}
+.box{background:var(--soft);border-radius:12px;padding:12px;font-size:13.5px}
+/* Zonas */
+.zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.zone{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:10px;font-family:inherit;font-size:14px;cursor:pointer;text-align:left}
+.zone small{display:block;color:var(--mu);font-size:11px}
+.zgroup{font-size:12px;font-weight:600;color:var(--mu);margin:4px 0 -4px}
+.loading{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:20;color:var(--mu);font-size:14px}
+.perfo{border:1.5px solid var(--accent);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.perfo-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.perfo-h b{font-size:15px}
+.x{background:none;border:none;color:var(--mu);font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline}
+/* Entrega del celular */
+.handoff{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.handoff .ico{width:84px;height:84px;border-radius:24px;background:var(--soft);display:grid;place-items:center;font-size:40px}
+.handoff h1{font-size:26px}
+details.leer{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+details.leer summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:14px}
+details.leer div{font-size:13px;color:var(--fg);margin-top:8px;max-height:280px;overflow:auto}
+details.leer li{margin-bottom:4px}
+.sigwrap{position:relative;border:2px dashed var(--line);border-radius:12px;background:var(--paper);touch-action:none}
+canvas#sig{display:block;width:100%;height:200px;border-radius:10px;cursor:crosshair}
+.sigline{position:absolute;left:20px;right:20px;bottom:44px;border-bottom:1px solid #d1d5db;pointer-events:none}
+.sigph{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:12px;color:#9ca3af;pointer-events:none}
+.summary{font-size:14px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+.summary dt{color:var(--mu)}
+.summary dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.done-ico{width:56px;height:56px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;font-size:28px;margin:8px auto 0}
+.center{text-align:center}
+.timeline{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.timeline div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.timeline b{white-space:nowrap;text-align:right}
+/* Vista previa de la nota */
+.nota{border:1.5px solid var(--team);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.nota .ln{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.nota .ln span:last-child{color:var(--mu);text-align:right}
+.nota .pend{color:var(--warn-fg);background:var(--warn-bg);border-radius:8px;padding:6px 8px;font-size:13px}
+/* Documento (vista previa del PDF): siempre en papel blanco */
+.doc{background:var(--paper);color:var(--ink);border-radius:8px;padding:22px 20px;font-size:11.5px;line-height:1.45;box-shadow:0 2px 14px rgba(0,0,0,.12);overflow-x:auto}
+.doc h3{text-align:center;margin:0;font-size:15px;color:var(--ink)}
+.doc h4{text-align:center;margin:0 0 10px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.doc ul{padding-left:18px;margin:6px 0}
+.doc table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}
+.doc td{border:1px solid #e5e7eb;padding:4px 6px;vertical-align:top;color:var(--ink);font-size:11px}
+.doc .sec{background:#fdf2f8;font-weight:700}
+.doc .firma{margin-top:14px;text-align:center}
+.doc .firma img{max-width:220px;height:auto;display:block;margin:0 auto -6px}
+.doc .firma .ln{border-top:1px solid #111;width:70%;margin:0 auto;padding-top:3px}
+.doc .marca{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:11px}
+@media (max-width:380px){.row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.step{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+
+<div class="loading" id="loading">Cargando…</div>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="logo">YIYI PASH</span>
+      <span style="display:flex;gap:6px;align-items:center">
+        <span class="demo" id="demoTag" hidden>DEMO</span>
+        <button class="where" id="whereBtn" type="button"></button>
+      </span>
+    </div>
+    <span class="phase team" id="phase">Equipo</span>
+    <div class="bar" id="bar"></div>
+    <div class="stepname" id="stepname"></div>
+  </header>
+
+  <!-- ═══════════ EQUIPO ═══════════ -->
+  <section class="step" data-step="0" data-part="team" data-name="Antes de empezar">
+    <h1>Antes de empezar</h1>
+    <p class="hint">Se guarda en este celular y es el mismo dato que usa la nota.</p>
+    <div class="card">
+      <label class="f">Lugar<select id="lugar"></select></label>
+      <label class="f" id="lugarOtroWrap" hidden>¿Cuál lugar?<input type="text" id="lugarOtro" placeholder="Ej. Bazar de la UAM"></label>
+      <label class="f">Quién atiende<select id="atiende"></select></label>
+      <label class="f" id="claveWrap" hidden>Clave del equipo<input type="password" id="clave" autocomplete="off" placeholder="La misma de la nota"></label>
+    </div>
+  </section>
+
+  <section class="step" data-step="1" data-part="team" data-name="Buscar clienta">
+    <h1>¿Ya ha venido antes?</h1>
+    <p class="hint">Busca por nombre, apodo o WhatsApp.</p>
+    <div class="card">
+      <input type="search" id="q" placeholder="Ej. Luis o 5547061079" autocomplete="off">
+      <div id="results" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <button class="btn sec" type="button" id="btnNueva">Es nueva</button>
+  </section>
+
+  <section class="step" data-step="2" data-part="team" data-name="Perforaciones">
+    <h1>¿Qué se va a perforar?</h1>
+    <p class="hint" id="perfHint">Toca la zona. La pieza se elige después, en la nota.</p>
+    <div id="perfos" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
+    <div class="card"><div id="zonas" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button class="btn sec" type="button" id="btnOtraZona">+ Otra zona (escribirla)</button></div>
+    <div class="card">
+      <label class="f">¿Quién perfora?<select id="perforadora"></select></label>
+      <label class="f">Notas del equipo <span class="opc">(opcional, solo las ve el equipo)</span><textarea id="notasEquipo" placeholder="Algo que no esté contemplado arriba"></textarea></label>
+    </div>
+  </section>
+
+  <section class="step" data-step="3" data-part="handoff" data-name="Pasa el celular">
+    <div class="handoff">
+      <div class="ico">📱</div>
+      <h1 id="handTit">Pásale el celular a la clienta</h1>
+      <p class="hint" id="handTxt">Ella revisa sus datos, contesta lo de salud, da sus permisos y firma.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════ CLIENTA ═══════════ -->
+  <section class="step" data-step="4" data-part="client" data-name="Tus datos">
+    <h1 id="datosTit">Tus datos</h1>
+    <p class="hint" id="datosHint">Revisa que estén bien.</p>
+    <div class="card">
+      <div class="row">
+        <label class="f">¿Cómo te gusta que te digan?<input type="text" id="apodo" autocomplete="off"></label>
+        <label class="f">Fecha de nacimiento<input type="date" id="fn"></label>
+      </div>
+      <label class="f">Nombre completo<input type="text" id="nombre" autocomplete="off"></label>
+      <div class="row">
+        <label class="f">WhatsApp (10 dígitos)<input type="tel" id="wa" inputmode="numeric" placeholder="5512345678"></label>
+        <label class="f">Correo <span class="opc">(opcional)</span><input type="email" id="email"></label>
+      </div>
+    </div>
+    <div class="card" id="tutorCard" hidden>
+      <h2>Eres menor de edad: datos de tu mamá, papá o tutor</h2>
+      <label class="f">Nombre completo del tutor<input type="text" id="tnombre"></label>
+      <div class="row">
+        <label class="f">Parentesco<input type="text" id="tpar" placeholder="Madre, padre…"></label>
+        <label class="f">WhatsApp del tutor<input type="tel" id="twa" inputmode="numeric"></label>
+      </div>
+      <label class="f" id="tfnWrap" hidden>Fecha de nacimiento del tutor<input type="date" id="tfn"></label>
+    </div>
+  </section>
+
+  <section class="step" data-step="5" data-part="client" data-name="Tu salud">
+    <h1>Tu salud</h1>
+    <p class="hint">Solo la ven las perforadoras y administración. Es para cuidarte.</p>
+    <div class="box" id="saludPrev" hidden></div>
+    <div class="card">
+      <label class="f">Tipo de sangre<select id="sangre">
+        <option value="">Elegir…</option><option>O+</option><option>O-</option><option>A+</option><option>A-</option>
+        <option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>No sé</option></select></label>
+    </div>
+    <div class="card"><h2>¿Padeces alguna enfermedad?</h2><div class="chips" id="enf"></div>
+      <input type="text" id="enfOtra" placeholder="Otra (escribe cuál)"></div>
+    <div class="card"><h2>¿Alguna condición importante?</h2><div class="chips" id="cond"></div>
+      <input type="text" id="condOtra" placeholder="Otra (escribe cuál)"></div>
+    <div class="card"><h2>¿Te da miedo alguno de estos?</h2><div class="chips" id="fob"></div></div>
+    <div class="card">
+      <label class="f">Alergias <span class="opc">(metales, medicamentos…)</span><input type="text" id="alergias" placeholder="Ninguna"></label>
+      <label class="f">Medicamentos que tomas <span class="opc">(opcional)</span><input type="text" id="meds" placeholder="Ninguno"></label>
+      <label class="f">Comentarios <span class="opc">(opcional)</span><textarea id="coment"></textarea></label>
+    </div>
+  </section>
+
+  <section class="step" data-step="6" data-part="client" data-name="Tus permisos">
+    <h1>Tus permisos</h1>
+    <p class="hint">Cada uno se acepta por separado.</p>
+    <details class="leer"><summary>Leer el consentimiento completo</summary><div id="textoConsent"></div></details>
+    <div class="card" style="margin-top:12px">
+      <label class="check"><input type="checkbox" id="aLeido"><span><span class="req">*</span> Leí el consentimiento, me aclararon mis dudas y acepto el procedimiento.</span></label>
+      <label class="check"><input type="checkbox" id="aSalud"><span><span class="req">*</span> Autorizo que Yiyi Pash use mis datos de salud solo para mi seguridad durante y después de la perforación.</span></label>
+    </div>
+    <div class="card">
+      <h2>¿Podemos publicar fotos de tu perforación en redes?</h2>
+      <div class="seg" id="segFotos"><button class="chip" type="button" data-v="si">Sí</button><button class="chip" type="button" data-v="no">No</button></div>
+      <h2>¿Te mandamos el manual de cuidados por WhatsApp?</h2>
+      <div class="seg" id="segManual"><button class="chip" type="button" data-v="si">Sí</button><button class="chip" type="button" data-v="no">No</button></div>
+    </div>
+    <div class="card" id="pinkCard"></div>
+  </section>
+
+  <section class="step" data-step="7" data-part="client" data-name="Firma">
+    <h1>Firma</h1>
+    <p class="hint" id="firmaHint">Firma con el dedo dentro del recuadro.</p>
+    <div class="card"><dl class="summary" id="resumen"></dl></div>
+    <div class="sigwrap"><canvas id="sig"></canvas><div class="sigline"></div><div class="sigph" id="sigph">Firma aquí</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span class="hint" style="margin:0" id="firmante"></span>
+      <button class="btn sec small" type="button" id="limpiar">Borrar firma</button>
+    </div>
+  </section>
+
+  <section class="step" data-step="8" data-part="handoff" data-name="Gracias">
+    <div class="handoff">
+      <div class="ico">💗</div>
+      <h1 id="graciasTit">¡Gracias!</h1>
+      <p class="hint">Tu consentimiento quedó firmado. Regresa el celular a quien te atiende.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════ EQUIPO: CIERRE ═══════════ -->
+  <section class="step" data-step="9" data-part="team" data-name="Listo">
+    <div class="done-ico">✓</div>
+    <h1 class="center">Consentimiento guardado</h1>
+    <p class="hint center" id="listoHint"></p>
+    <div class="box" id="alertaSalud" hidden></div>
+    <div class="card">
+      <h2>Sigue: la nota</h2>
+      <div class="nota" id="notaPrev"></div>
+      <button class="btn" type="button" id="btnNota">Continuar a la nota</button>
+      <p class="hint" style="margin:0" id="notaDemo" hidden>En la demo no se abre la nota. Ya conectado, se abre Notas Digitales con todo esto puesto y solo eliges las piezas.</p>
+    </div>
+    <a class="btn sec" id="waBtn" target="_blank" rel="noopener" style="margin-bottom:12px">Mandar manual de cuidados por WhatsApp</a>
+    <a class="btn sec" id="pdfBtn" target="_blank" rel="noopener" style="margin-bottom:12px" hidden>Ver el PDF firmado</a>
+    <div class="card">
+      <h2>Recordatorios programados</h2>
+      <div class="timeline" id="recordatorios"></div>
+    </div>
+    <div class="card">
+      <h2>Lo que se guardó</h2>
+      <div class="timeline" id="guardado"></div>
+    </div>
+    <div class="card">
+      <h2>Así queda el PDF</h2>
+      <div class="doc" id="doc"></div>
+    </div>
+  </section>
+
+  <p class="err" id="err"></p>
+</div>
+
+<footer class="nav"><div class="in">
+  <button class="btn sec" type="button" id="back">Atrás</button>
+  <button class="btn" type="button" id="next">Siguiente</button>
+</div></footer>
+
+<script>
+// ── Configuración ────────────────────────────────────────────────────
+// En GitHub, las listas (lugares, equipo, zonas, servicios y texto) vienen del servidor (consent_config).
+// Lo de aquí abajo es solo para la demo.
+const CFG={
+  url:'https://script.google.com/macros/s/AKfycbwJhAO5anQhZ_tzZ7f6jSE133AxFzSLU2rXkVH1vdtH9SlkMlbnvdjbez3786HIEhAf/exec',
+  notas:'https://yiyipash.github.io/Notas_digitales/',
+  manual:'https://drive.google.com/drive/folders/1OQgdBLqUJ-0H-Aib08YtvjkkbQwQ59TX?usp=drive_link',
+  lugares:['Yiyipash Studio','Peace & Love Stores','Casa OKO','Peace & Love Market','Catarsis Bazar'],
+  equipo:[{id:'ART-001',alias:'Yiyi'},{id:'STA-001',alias:'Luis'},{id:'',alias:'Cam'},{id:'ART-003',alias:'Kat'}],
+  perforadoras:[{id:'ART-001',alias:'Yiyi'},{id:'ART-003',alias:'Kat'}],
+  enfermedades:['Ansiedad','Dermatitis','Hipertensión','Presión baja','Diabetes','Resistencia a la insulina','Hipotiroidismo','Cicatrización queloide','Problemas de coagulación','Anemia','Epilepsia','Lupus'],
+  condiciones:['Embarazo','Lactancia','Tratamiento inmunodepresivo (radioterapia, quimioterapia)','Tomo anticoagulantes','Enfermedad infecciosa, fiebre o gripe'],
+  fobias:['Sangre','Agujas (cánulas o catéteres)','Tijeras o pinzas'],
+  // Zonas: servicio de la nota, lados permitidos y días de cuidado [seguimiento, retiro] (borrador)
+  zonas:[
+    // Ya conectado, salen de la columna Zonas del catálogo de servicios; "(centro)" = solo se hace al centro.
+    {z:'Lóbulo',g:'Oreja',serv:'PIR-001'},{z:'Lóbulo superior',g:'Oreja',serv:'PIR-001'},{z:'Helix',g:'Oreja',serv:'PIR-001'},
+    {z:'Tragus',g:'Oreja',serv:'PIR-002'},{z:'Antitragus',g:'Oreja',serv:'PIR-002'},{z:'Industrial',g:'Oreja',serv:'PIR-002'},
+    {z:'Conch',g:'Oreja',serv:'PIR-002'},{z:'Daith',g:'Oreja',serv:'PIR-002'},
+    {z:'Flat',g:'Oreja',serv:'PIR-002'},{z:'Rook',g:'Oreja',serv:'PIR-002'},
+    {z:'Forward helix',g:'Oreja',serv:'PIR-002'},{z:'Midi helix',g:'Oreja',serv:'PIR-002'},{z:'Antihelix',g:'Oreja',serv:'PIR-002'},
+    {z:'Nostril',g:'Cara',serv:'PIR-003'},{z:'Septum',g:'Cara',serv:'PIR-004',lados:['Centro']},{z:'Ceja',g:'Cara',serv:'PIR-006'},
+    {z:'Nipple',g:'Cuerpo',serv:'PIR-005'},{z:'Ombligo',g:'Cuerpo',serv:'PIR-007',lados:['Centro']},
+  ],
+  ladosDefault:['Izquierdo','Derecho','Ambos'],
+  ladosTodos:['Izquierdo','Derecho','Ambos','Centro'],
+  servicios:{'PIR-001':['Perforación oreja básica',140],'PIR-002':['Perforación oreja avanzada',160],'PIR-003':['Perforación nostril',160],'PIR-004':['Perforación septum',160],'PIR-005':['Perforación nipple',160],'PIR-006':['Perforación ceja',160],'PIR-007':['Perforación navy',160]},
+  dias:{seguimiento:30,retiro:14},
+};
+// Demo fuera de GitHub (por ejemplo, la vista previa) o con ?demo en la liga
+const DEMO=!/\.github\.io$/.test(location.hostname)||/[?&]demo/.test(location.search);
+// Datos de ejemplo para el modo demo. En producción vienen del servidor.
+const DEMO_PERSONAS=[
+  {id:'LUI-0001',apodo:'Luis',nombre:'Luis Enrique Lopez Pacheco',fn:'2002-08-16',wa:'5547061079',email:'luiselp0216@gmail.com',pink:{estado:'Registrada',puntos:0},ultima:null},
+  {id:'EJE-0001',apodo:'Ana (ejemplo)',nombre:'Ana Ejemplo Ficticia',fn:'2011-03-02',wa:'5500000000',email:'',pink:null,
+   tutor:{nombre:'María Ficticia',par:'Madre',wa:'5500000001'},
+   ultima:{fecha:'2026-05-14',sangre:'O+',enf:['Ansiedad'],cond:[],fob:['Agujas (cánulas o catéteres)'],alergias:'Níquel',meds:'',enfOtra:'',condOtra:''}},
+];
+
+// ── Estado ───────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dig=s=>String(s||'').replace(/\D/g,'');
+const S={step:0,persona:null,salud:{enf:[],cond:[],fob:[]},perfos:[],fotos:null,manual:null,pink:null,firmaVacia:true,res:null};
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const steps=[...document.querySelectorAll('.step')];
+const LAST=steps.length-1;
+const zona=z=>CFG.zonas.find(x=>x.z===z);
+const servNom=sku=>(CFG.servicios[sku]||['Sin servicio en el catálogo',''])[0];
+const servPrecio=sku=>(CFG.servicios[sku]||['',''])[1];
+const ladosDe=p=>p.custom?CFG.ladosTodos:((zona(p.zona)||{}).lados||CFG.ladosDefault);
+
+// ── Servidor ─────────────────────────────────────────────────────────
+async function api(action,data){
+  const res=await fetch(CFG.url,{method:'POST',headers:{'Content-Type':'text/plain'},redirect:'follow',
+    body:JSON.stringify(Object.assign({action,clave:store.get('yp_pink_clave')||''},data||{}))});
+  const j=await res.json();
+  if(!j.ok){if(/Clave de equipo/i.test(j.error||'')){try{localStorage.removeItem('yp_pink_clave')}catch(e){}}throw new Error(j.error||'Error del servidor');}
+  return j.data;
+}
+async function cargarConfig(){
+  const res=await fetch(CFG.url+'?action=consent_config',{redirect:'follow'});
+  const j=await res.json();if(!j.ok)throw new Error(j.error||'No pude cargar las listas');
+  const c=j.data;
+  CFG.lugares=c.lugares;CFG.equipo=c.equipo;CFG.perforadoras=c.perforadoras;CFG.manual=c.manual;CFG.dias.seguimiento=c.dias.seguimiento;
+  CFG.zonas=c.zonas.map(z=>({z:z.z,g:z.grupo,serv:z.serv,lados:z.lados||undefined}));
+  CFG.servicios={};c.servicios.forEach(x=>CFG.servicios[x.sku]=[x.nombre,x.precio]);
+  $('textoConsent').innerHTML=c.texto;
+}
+
+function edad(iso){const m=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return null;const h=new Date();let e=h.getFullYear()-+m[1];if(h.getMonth()+1<+m[2]||(h.getMonth()+1==+m[2]&&h.getDate()<+m[3]))e--;return e;}
+function fmt(d){return d.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});}
+function sumaDias(n){const d=new Date();d.setDate(d.getDate()+n);return d;}
+const atiende=()=>store.get('yp_elaboro_alias')||'—';
+const lugar=()=>store.get('yp_lugar')==='Otro'?(store.get('yp_lugar_otro')||'Otro'):(store.get('yp_lugar')||'');
+// "Ambos" son dos perforaciones: una por lado
+const perfosPorLado=()=>S.perfos.flatMap(p=>p.lado==='Ambos'?[{...p,lado:'Izquierdo'},{...p,lado:'Derecho'}]:[p]);
+
+// ── Pasos ────────────────────────────────────────────────────────────
+// Equipo: 0-2 · entrega: 3 · Clienta: 4-7 · gracias: 8 · Equipo: 9
+const BACK_OK={2:1,3:2,4:3,5:4,6:5,7:6};
+function show(n){
+  S.step=n;$('err').textContent='';
+  steps.forEach((s,i)=>s.hidden=i!==n);
+  const part=steps[n].dataset.part;
+  const cli=part==='client'||n===3||n===8;
+  $('phase').className='phase '+(cli?'client':'team');
+  $('phase').textContent=cli?'Para la clienta':'Equipo';
+  const vis=[1,2,4,5,6,7,9];
+  $('bar').innerHTML=vis.map(i=>`<i class="${i<=2||i===9?'team':''} ${i<=n?'on':''}"></i>`).join('');
+  $('stepname').textContent=n?steps[n].dataset.name:'';
+  $('back').hidden=!(n in BACK_OK);
+  const labels={1:'',2:'Listo, pasar a la clienta',3:'Soy la clienta, empezar',7:'Firmar y terminar',8:'Soy del equipo, continuar',9:'Siguiente clienta'};
+  $('next').textContent=labels[n]||'Siguiente';
+  $('next').hidden=n===1;
+  $('back').parentElement.style.gridTemplateColumns=($('back').hidden||$('next').hidden)?'1fr':'1fr 2fr';
+  $('whereBtn').hidden=cli;
+  if(n===2)renderZonas();
+  if(n===3)renderHandoff();
+  if(n===6)renderPink();
+  if(n===7){setTimeout(sizeCanvas,0);renderResumen();}
+  if(n===8){$('next').disabled=true;setTimeout(()=>$('next').disabled=false,1500);}  // evita que un doble toque de la clienta salte a la pantalla del equipo
+  window.scrollTo(0,0);
+}
+function where(){ $('whereBtn').textContent=`${lugar()||'Sin lugar'} · ${atiende()} ✎`; }
+
+$('next').onclick=()=>{
+  const e=validar(S.step);if(e){$('err').textContent=e;return;}
+  if(S.step===0)return guardarPaso0();
+  if(S.step===7)return guardar();
+  if(S.step===9)return reiniciar();
+  show(S.step+1);
+};
+$('back').onclick=()=>show(BACK_OK[S.step]);
+$('whereBtn').onclick=()=>show(0);
+
+async function guardarPaso0(){
+  if($('lugar').value==='Otro'&&!$('lugarOtro').value.trim())return $('err').textContent='Escribe el lugar.';
+  if(!DEMO&&!store.get('yp_pink_clave')){
+    const c=$('clave').value.trim();if(!c)return $('err').textContent='Escribe la clave del equipo.';
+    const b=$('next');b.disabled=true;
+    try{store.set('yp_pink_clave',c);await api('pink_validar_clave');}
+    catch(x){$('err').textContent=x.message;return;}
+    finally{b.disabled=false;}
+  }
+  const o=$('atiende').selectedOptions[0];
+  store.set('yp_lugar',$('lugar').value);store.set('yp_lugar_otro',$('lugarOtro').value.trim());
+  store.set('yp_elaboro_id',o.value);store.set('yp_elaboro_alias',o.textContent);
+  $('claveWrap').hidden=true;where();show(1);
+}
+function validar(n){
+  if(n===2){
+    if(!S.perfos.length)return 'Elige al menos una zona.';
+    if(S.perfos.some(p=>!p.zona.trim()))return 'Escribe el nombre de la otra zona.';
+    if(S.perfos.some(p=>!p.lado))return 'Elige el lado de cada perforación.';
+  }
+  if(n===4){
+    const e=edad($('fn').value);
+    if(!$('apodo').value.trim()||!$('nombre').value.trim())return 'Falta tu apodo o tu nombre completo.';
+    if(e===null||e<0||e>110)return 'Revisa tu fecha de nacimiento.';
+    if(dig($('wa').value).length!==10)return 'Tu WhatsApp debe tener 10 dígitos.';
+    if(e<18&&(!$('tnombre').value.trim()||!$('tpar').value.trim()||dig($('twa').value).length!==10))return 'Faltan los datos de tu tutor (nombre, parentesco y WhatsApp).';
+    if(e<12&&edad($('tfn').value)===null)return 'Falta la fecha de nacimiento de tu tutor.';
+  }
+  if(n===5){
+    if(!$('sangre').value)return 'Elige tu tipo de sangre (o "No sé").';
+    if(!S.salud.enf.length&&!$('enfOtra').value.trim())return 'Marca tus enfermedades o "Ninguna".';
+    if(!S.salud.cond.length&&!$('condOtra').value.trim())return 'Marca tus condiciones o "Ninguna".';
+    if(!S.salud.fob.length)return 'Marca tus miedos o "Ninguno".';
+  }
+  if(n===6){
+    if(!$('aLeido').checked||!$('aSalud').checked)return 'Las dos primeras casillas son obligatorias.';
+    if(!S.fotos)return 'Falta contestar lo de las fotos.';
+    if(!S.manual)return 'Falta contestar lo del manual de cuidados.';
+    if(!(S.persona&&S.persona.pink)&&!S.pink)return 'Falta contestar si quieres unirte al Pink Club.';
+    if(S.pink==='si'&&!$('pAviso').checked)return 'Para el Pink Club debes aceptar el aviso de privacidad y los términos.';
+  }
+  if(n===7&&S.firmaVacia)return 'Falta la firma.';
+  return '';
+}
+
+// ── Paso 0 ───────────────────────────────────────────────────────────
+function llenarListas(){
+  $('lugar').innerHTML=[...CFG.lugares,'Otro'].map(l=>`<option>${esc(l)}</option>`).join('');
+  $('atiende').innerHTML=CFG.equipo.map(p=>`<option value="${esc(p.id)}">${esc(p.alias)}</option>`).join('');
+  $('perforadora').innerHTML=[...CFG.perforadoras.map(p=>p.alias),'Otra persona'].map(a=>`<option>${esc(a)}</option>`).join('');
+}
+$('lugar').onchange=()=>{$('lugarOtroWrap').hidden=$('lugar').value!=='Otro';};
+
+// ── Paso 1: buscar ───────────────────────────────────────────────────
+const norm=s=>String(s||'').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim();
+let hits=[],tBuscar=null;
+$('q').addEventListener('input',()=>{
+  clearTimeout(tBuscar);
+  const raw=$('q').value.trim(),q=norm(raw),qd=dig(q);
+  if(q.length<3){$('results').innerHTML='';return;}
+  tBuscar=setTimeout(async()=>{
+    if(DEMO)hits=DEMO_PERSONAS.filter(p=>norm(p.nombre).includes(q)||norm(p.apodo).includes(q)||(qd.length>=4&&p.wa.includes(qd)));
+    else{
+      $('results').innerHTML='<p class="hint" style="margin:0">Buscando…</p>';
+      try{const d=await api('consent_buscar',{q:raw});if($('q').value.trim()!==raw)return;hits=d.resultados;}
+      catch(x){$('results').innerHTML=`<p class="err">${esc(x.message)}</p>`;return;}
+    }
+    $('results').innerHTML=hits.length?hits.map((p,i)=>`<button class="result" type="button" data-i="${i}">
+        <span><b>${esc(p.apodo)} · ${esc(p.nombre)}</b><small>${esc(p.id)} · WhatsApp …${esc(String(p.wa).slice(-4))}${p.ultima&&p.ultima.fecha?' · última visita '+fmt(new Date(p.ultima.fecha+'T12:00')):''}</small></span>
+        ${p.pink?'<span class="pill pink">Pink</span>':''}</button>`).join('')
+      :'<p class="hint" style="margin:0">No la encontré. Puede ser nueva.</p>';
+    $('results').querySelectorAll('.result').forEach(b=>b.onclick=()=>elegir(hits[+b.dataset.i]));
+  },DEMO?0:400);
+});
+function elegir(p){
+  S.persona=p;
+  $('apodo').value=p.apodo;$('nombre').value=p.nombre;$('fn').value=p.fn;$('wa').value=p.wa;$('email').value=p.email||'';
+  if(p.tutor){$('tnombre').value=p.tutor.nombre;$('tpar').value=p.tutor.par;$('twa').value=p.tutor.wa;}
+  $('datosTit').textContent=`Hola de nuevo, ${p.apodo} 💗`;
+  $('datosHint').textContent='Revisa que tus datos sigan igual.';
+  revisarEdad();
+  if(p.ultima){
+    const u=p.ultima;
+    $('sangre').value=u.sangre==='No sabe'?'No sé':u.sangre;S.salud.enf=[...u.enf];S.salud.cond=[...u.cond];S.salud.fob=[...u.fob];
+    // lo que no está en las listas va a "Otra"
+    const fuera=(arr,lista)=>arr.filter(x=>!lista.includes(x)&&!/^Ningun[ao]$/.test(x)).join(', ');
+    const enfOtra=u.enfOtra||fuera(u.enf,CFG.enfermedades),condOtra=u.condOtra||fuera(u.cond,CFG.condiciones);
+    S.salud.enf=u.enf.filter(x=>CFG.enfermedades.includes(x)||x==='Ninguna');S.salud.cond=u.cond.filter(x=>CFG.condiciones.includes(x)||x==='Ninguna');
+    S.salud.fob=u.fob.filter(x=>CFG.fobias.includes(x)||x==='Ninguno');
+    $('alergias').value=u.alergias;$('meds').value=u.meds;$('enfOtra').value=enfOtra;$('condOtra').value=condOtra;
+    if(!S.salud.enf.length&&!enfOtra)S.salud.enf=['Ninguna'];
+    if(!S.salud.cond.length&&!condOtra)S.salud.cond=['Ninguna'];
+    if(!S.salud.fob.length)S.salud.fob=['Ninguno'];
+    $('saludPrev').hidden=false;
+    $('saludPrev').innerHTML=`Esto es lo que nos dijiste el <b>${fmt(new Date(u.fecha+'T12:00'))}</b>. Cambia lo que ya no sea igual.`;
+    pintarChips();
+  }
+  show(2);
+}
+$('btnNueva').onclick=()=>{
+  S.persona=null;['apodo','nombre','fn','wa','email','tnombre','tpar','twa','tfn'].forEach(id=>$(id).value='');
+  $('datosTit').textContent='Tus datos';$('datosHint').textContent='Con esto te creamos tu ID de clienta.';
+  revisarEdad();show(2);
+};
+function revisarEdad(){
+  const e=edad($('fn').value);
+  $('tutorCard').hidden=!(e!==null&&e<18);
+  $('tfnWrap').hidden=!(e!==null&&e<12);
+}
+$('fn').addEventListener('change',revisarEdad);
+
+// ── Paso 2: zonas y lados ────────────────────────────────────────────
+function renderZonas(){
+  $('perfHint').textContent=S.persona?`Para ${S.persona.apodo}. Toca la zona; la pieza se elige después, en la nota.`:'Toca la zona. La pieza se elige después, en la nota.';
+  const grupos=[...new Set(CFG.zonas.map(z=>z.g))];
+  $('zonas').innerHTML=grupos.map(g=>`<div class="zgroup">${g}</div><div class="zones">${
+    CFG.zonas.filter(z=>z.g===g).map(z=>`<button class="zone" type="button" data-z="${esc(z.z)}">${esc(z.z)}</button>`).join('')}</div>`).join('');
+  $('zonas').querySelectorAll('.zone').forEach(b=>b.onclick=()=>{
+    const z=zona(b.dataset.z),lados=z.lados||CFG.ladosDefault;
+    S.perfos.push({zona:z.z,lado:lados.length===1?lados[0]:'',serv:z.serv,custom:false});
+    renderPerfos();
+  });
+  renderPerfos();
+}
+function renderPerfos(){
+  $('perfos').innerHTML=S.perfos.map((p,i)=>{
+    const lados=ladosDe(p);
+    return `<div class="perfo">
+      <div class="perfo-h">${p.custom?`<input type="text" data-zt="${i}" value="${esc(p.zona)}" placeholder="Nombre de la zona" style="flex:1">`:`<b>${esc(p.zona)}</b>`}<button class="x" type="button" data-del="${i}">Quitar</button></div>
+      ${p.custom?`<label class="f">Servicio para la nota<select data-sv="${i}"><option value="">Sin servicio</option>${Object.keys(CFG.servicios).map(k=>`<option value="${esc(k)}"${p.serv===k?' selected':''}>${esc(servNom(k))}</option>`).join('')}</select></label>`:''}
+      ${lados.length===1?`<span class="hint" style="margin:0">Solo se hace al ${esc(lados[0].toLowerCase())}.</span>`
+        :`<div class="chips">${lados.map(l=>`<button class="chip" type="button" data-i="${i}" data-lado="${l}" aria-pressed="${p.lado===l}">${l}</button>`).join('')}</div>`}
+    </div>`;}).join('');
+  $('perfos').querySelectorAll('[data-lado]').forEach(b=>b.onclick=()=>{S.perfos[+b.dataset.i].lado=b.dataset.lado;renderPerfos();});
+  $('perfos').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{S.perfos.splice(+b.dataset.del,1);renderPerfos();});
+  $('perfos').querySelectorAll('[data-zt]').forEach(t=>t.oninput=()=>{S.perfos[+t.dataset.zt].zona=t.value;});
+  $('perfos').querySelectorAll('[data-sv]').forEach(t=>t.onchange=()=>{S.perfos[+t.dataset.sv].serv=t.value;});
+}
+$('btnOtraZona').onclick=()=>{S.perfos.push({zona:'',lado:'',serv:'',custom:true});renderPerfos();const t=[...$('perfos').querySelectorAll('[data-zt]')].pop();if(t)t.focus();};
+
+// ── Paso 3: entrega ──────────────────────────────────────────────────
+function renderHandoff(){
+  const n=S.persona?S.persona.apodo:'la clienta';
+  $('handTit').textContent=S.persona?`Pásale el celular a ${n}`:'Pásale el celular a la clienta';
+}
+
+// ── Paso 5: chips de salud ───────────────────────────────────────────
+function chips(id,lista,key,ninguna){
+  $(id).innerHTML=[ninguna,...lista].map(v=>`<button class="chip${v===ninguna?' none':''}" type="button" aria-pressed="false" data-v="${esc(v)}">${esc(v)}</button>`).join('');
+  $(id).querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.v,arr=S.salud[key];
+    if(v===ninguna)S.salud[key]=arr.includes(v)?[]:[v];
+    else{S.salud[key]=arr.filter(x=>x!==ninguna);const i=S.salud[key].indexOf(v);i<0?S.salud[key].push(v):S.salud[key].splice(i,1);}
+    pintarChips();
+  });
+}
+function pintarChips(){
+  ['enf','cond','fob'].forEach(k=>$(k).querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',S.salud[k].includes(b.dataset.v))));
+}
+chips('enf',CFG.enfermedades,'enf','Ninguna');
+chips('cond',CFG.condiciones,'cond','Ninguna');
+chips('fob',CFG.fobias,'fob','Ninguno');
+
+// ── Paso 6: permisos ─────────────────────────────────────────────────
+$('textoConsent').innerHTML=`<b>Indicaciones previas</b><ul>
+<li>No estar bajo los efectos de drogas o alcohol al momento del procedimiento.</li>
+<li>No haber consumido alcohol, drogas o anticoagulantes (como aspirina o ibuprofeno) en las 6 horas previas.</li>
+<li>Si la persona es menor de edad, el consentimiento lo firma su madre, padre o tutor legal, quien autoriza y supervisa el procedimiento.</li>
+<li>Acudir en buenas condiciones de salud y habiendo comido, para evitar mareos o desmayos.</li>
+<li>No se puede realizar si hay enfermedad infecciosa, fiebre, gripe o alguna condición que comprometa el sistema inmunológico.</li>
+<li>Informar cualquier condición médica preexistente o tratamiento médico.</li></ul>
+<b>Material</b><ul><li>Cánula o catéter nuevo, sellado y estéril; pieza desinfectada y estéril; guantes nuevos y estériles; paquete de limpieza nuevo y sellado; instrumental desinfectado y estéril.</li></ul>
+<b>Declaración</b><p>Declaro, en pleno uso de mis facultades, que conozco el procedimiento, que se aclararon mis dudas y que se me explicaron el proceso, los cuidados y los posibles riesgos (infección, rechazo o cicatrización irregular). Se me mostró el material nuevo, sellado y estéril, de uso personal, que será desechado. Me comprometo a seguir las indicaciones de higiene y cuidados. Entiendo que Yiyi Pash y la perforadora no son responsables de complicaciones posteriores, y que ante dudas durante la curación debo contactar a Yiyi Pash.</p>
+<p>Mis datos se tratan según el aviso de privacidad de Yiyi Pash (yiyipash.github.io/pink/aviso.html).</p>`;
+function seg(id,key){$(id).querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;$(id).querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));if(key==='pink')renderPinkExtra();});}
+seg('segFotos','fotos');seg('segManual','manual');
+function renderPink(){
+  const p=S.persona;
+  if(p&&p.pink){
+    $('pinkCard').innerHTML=`<h2>Pink Club 💗</h2><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>Ya eres Pink: <b>${esc(p.id)}</b></span><span class="pill ${p.pink.estado==='Activa'?'ok':'warn'}">${esc(p.pink.estado)}</span></div><p class="hint" style="margin:0">Lo que compres hoy suma puntos.</p>`;
+    return;
+  }
+  const e=edad($('fn').value);
+  $('pinkCard').innerHTML=`<h2>¿Quieres unirte al Pink Club? 💗</h2>
+    <p class="hint" style="margin:0">Es gratis: 1 punto por cada $10 de compra. Al llegar a $500 se activa y cambias tus puntos por joyería.${e!==null&&e<12?' Como eres menor de 12, tus compras suman en la cuenta de tu tutor.':''}</p>
+    <div class="seg" id="segPink"><button class="chip" type="button" data-v="si" aria-pressed="${S.pink==='si'}">Sí</button><button class="chip" type="button" data-v="no" aria-pressed="${S.pink==='no'}">No</button></div>
+    <div id="pinkExtra"></div>`;
+  seg('segPink','pink');renderPinkExtra();
+}
+function renderPinkExtra(){
+  const box=$('pinkExtra');if(!box)return;
+  const e=edad($('fn').value);
+  box.innerHTML=S.pink==='si'?`<div style="display:flex;flex-direction:column;gap:10px">
+    <label class="check"><input type="checkbox" id="pAviso"><span><span class="req">*</span> Acepto el <a href="https://yiyipash.github.io/pink/aviso.html" target="_blank" rel="noopener">aviso de privacidad</a> y los <a href="https://yiyipash.github.io/pink/terminos.html" target="_blank" rel="noopener">términos del Pink Club</a>.</span></label>
+    ${e!==null&&e>=18?'<label class="check"><input type="checkbox" id="pMkt"><span>Quiero recibir promociones por WhatsApp.</span></label>':''}</div>`:'';
+}
+
+// ── Paso 7: firma ────────────────────────────────────────────────────
+const cv=$('sig'),ctx=cv.getContext('2d');let drawing=false,last=null;
+function sizeCanvas(){
+  const r=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  if(!r.width)return;
+  const img=S.firmaVacia?null:cv.toDataURL();
+  cv.width=r.width*dpr;cv.height=r.height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.lineWidth=2.4;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111827';
+  if(img){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,r.width,r.height);im.src=img;}
+}
+function pos(e){const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+cv.addEventListener('pointerdown',e=>{drawing=true;last=pos(e);cv.setPointerCapture(e.pointerId);ctx.beginPath();ctx.arc(last.x,last.y,1.1,0,7);ctx.fillStyle='#111827';ctx.fill();marcar();});
+cv.addEventListener('pointermove',e=>{if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;});
+['pointerup','pointercancel','pointerleave'].forEach(t=>cv.addEventListener(t,()=>drawing=false));
+function marcar(){S.firmaVacia=false;$('sigph').hidden=true;}
+// La firma se manda a 600 px de ancho para que pese poco
+function firmaPNG(){
+  const w=Math.min(600,cv.width),h=Math.round(cv.height*w/cv.width),c=document.createElement('canvas');
+  c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(cv,0,0,w,h);
+  return c.toDataURL('image/png');
+}
+$('limpiar').onclick=()=>{ctx.clearRect(0,0,cv.width,cv.height);S.firmaVacia=true;$('sigph').hidden=false;};
+window.addEventListener('resize',()=>{if(S.step===7)sizeCanvas();});
+function firmante(){const e=edad($('fn').value);return e!==null&&e<18?{quien:'Tutor',nombre:$('tnombre').value.trim()}:{quien:'Clienta',nombre:$('nombre').value.trim()};}
+const perfTxt=()=>S.perfos.map(p=>`${p.zona}${p.lado==='Centro'?'':' '+p.lado.toLowerCase()}`).join(', ');
+function renderResumen(){
+  const f=firmante();
+  $('firmante').textContent=`Firma: ${f.nombre}${f.quien==='Tutor'?' (tutor)':''}`;
+  $('firmaHint').textContent=f.quien==='Tutor'?'Como eres menor de edad, firma tu mamá, papá o tutor.':'Firma con el dedo dentro del recuadro.';
+  $('resumen').innerHTML=`<dt>Nombre</dt><dd>${esc($('nombre').value)}</dd><dt>Perforación</dt><dd>${esc(perfTxt())}</dd><dt>Fotos en redes</dt><dd>${S.fotos==='si'?'Sí autorizo':'No autorizo'}</dd>`;
+}
+
+// ── Guardar ──────────────────────────────────────────────────────────
+function payload(){
+  const e=edad($('fn').value),f=firmante();
+  return{action:'consent_guardar',lugar:lugar(),atiende:{id:store.get('yp_elaboro_id')||'',alias:atiende()},
+    perforadora:$('perforadora').value,notas_equipo:$('notasEquipo').value.trim(),
+    persona:{id_clienta:S.persona?S.persona.id:'',apodo:$('apodo').value.trim(),nombre_completo:$('nombre').value.trim(),fecha_nacimiento:$('fn').value,
+      whatsapp:dig($('wa').value),email:$('email').value.trim(),
+      tutor:e<18?{id:S.persona&&S.persona.tutor?S.persona.tutor.id||'':'',nombre:$('tnombre').value.trim(),parentesco:$('tpar').value.trim(),whatsapp:dig($('twa').value),fecha_nacimiento:$('tfn').value}:null},
+    salud:{tipo_sangre:$('sangre').value,enfermedades:[...S.salud.enf,$('enfOtra').value.trim()].filter(Boolean),condiciones:[...S.salud.cond,$('condOtra').value.trim()].filter(Boolean),
+      fobias:S.salud.fob,alergias:$('alergias').value.trim(),medicamentos:$('meds').value.trim(),comentarios:$('coment').value.trim()},
+    perforaciones:perfosPorLado().map(p=>({zona:p.zona.trim(),lado:p.lado,sku_serv:p.serv||'',perforadora:$('perforadora').value})),
+    autorizaciones:{consentimiento:true,datos_salud:true,fotos:S.fotos==='si',manual_whatsapp:S.manual==='si',
+      pink:S.persona&&S.persona.pink?'ya_es':S.pink,aviso:S.pink==='si'&&$('pAviso').checked,marketing_wa:!!($('pMkt')&&$('pMkt').checked)},
+    firma:{firmante:f.quien,nombre:f.nombre,png:firmaPNG()}};
+}
+async function guardar(){
+  const btn=$('next');btn.disabled=true;btn.textContent='Guardando…';
+  const data=payload();
+  try{
+    let r;
+    if(DEMO){await new Promise(ok=>setTimeout(ok,600));
+      const id=data.persona.id_clienta||'NUE-0001';
+      r={id_clienta:id,id_consent:'CON-000001',nueva:!data.persona.id_clienta,pink_id:data.autorizaciones.pink==='si'?id:'',
+         perforaciones:data.perforaciones.map((p,i)=>({...p,id_perfo:'PER-00000'+(i+1)}))};}
+    else r=await api('consent_guardar',data);
+    S.res={d:data,r};
+    $('graciasTit').textContent=`¡Gracias, ${data.persona.apodo}!`;
+    show(8);
+  }catch(x){$('err').textContent=x.message;btn.disabled=false;}
+}
+// Pantalla final del equipo
+function listo(){
+  const {d,r}=S.res,p=d.persona,hoy=new Date();
+  $('listoHint').textContent=`${p.apodo} · ${r.id_clienta}${DEMO?' · (demo: no se guardó nada)':''}`;
+  const alertas=[...d.salud.enfermedades,...d.salud.condiciones].filter(x=>!/^Ninguna$/.test(x));
+  if(d.salud.alergias)alertas.push('Alergia: '+d.salud.alergias);
+  $('alertaSalud').hidden=!alertas.length;
+  $('alertaSalud').innerHTML=`<b>Revisa antes de perforar:</b> ${esc(alertas.join(' · '))}`;
+  // Vista previa de lo que llega a la nota
+  const cuenta={};r.perforaciones.forEach(x=>cuenta[x.sku_serv]=(cuenta[x.sku_serv]||0)+1);
+  $('notaPrev').innerHTML=`<div class="ln"><span>Nombre en la nota</span><span>${esc(p.apodo)}</span></div>
+    <div class="ln"><span>ID de la clienta</span><span>${esc(r.id_clienta)}</span></div>
+    <div class="ln"><span>Correo para la nota</span><span>${esc(p.email||'—')}</span></div>
+    ${r.perforaciones.map(x=>`<div class="ln"><span>${esc(x.zona)}${x.lado==='Centro'?'':' '+esc(x.lado.toLowerCase())}<br><small style="color:var(--mu)">${esc(servNom(x.sku_serv))}</small></span><span>${servPrecio(x.sku_serv)!==''?'$'+servPrecio(x.sku_serv):'—'}</span></div>`).join('')}
+    <div class="pend">Falta elegir la pieza de cada perforación (del inventario).</div>`;
+  $('notaDemo').hidden=!DEMO;
+  $('guardado').innerHTML=[
+    [r.nueva?'Clienta nueva':'Clienta actualizada',r.id_clienta],
+    ['Consentimiento',r.id_consent],
+    [r.perforaciones.length>1?`${r.perforaciones.length} perforaciones`:'1 perforación','Expediente'],
+    ['PDF firmado','Drive · '+d.lugar],
+    ...(d.autorizaciones.pink==='si'?[['Alta en el Pink Club',r.pink_id]]:[]),
+  ].map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');
+  const rec=[];
+  r.perforaciones.forEach(x=>{const lado=x.lado==='Centro'?'':' '+x.lado.toLowerCase();
+    rec.push([`Seguimiento · ${x.zona}${lado}`,sumaDias(CFG.dias.seguimiento)]);});
+  rec.sort((a,b)=>a[1]-b[1]);
+  $('recordatorios').innerHTML=rec.map(([a,b])=>`<div><span>${esc(a)}</span><b>${fmt(b)}</b></div>`).join('')+
+    `<p class="hint" style="margin:4px 0 0">Esa mañana aparece el WhatsApp listo para enviar. Si le ponen aros de silicón, el recordatorio de retiro (≈${CFG.dias.retiro} días) se programa solo desde la nota.</p>`;
+  const wa=p.tutor?p.tutor.whatsapp:p.whatsapp;
+  const msg=`Hola ${p.apodo} 💗 Gracias por perforarte en Yiyi Pash. Aquí está tu manual de cuidados: ${CFG.manual} Cualquier duda escríbenos por aquí.`;
+  $('waBtn').href=`https://wa.me/52${wa}?text=${encodeURIComponent(msg)}`;
+  $('waBtn').hidden=!d.autorizaciones.manual_whatsapp;
+  $('pdfBtn').hidden=!r.url_pdf;if(r.url_pdf)$('pdfBtn').href=r.url_pdf;
+  $('doc').innerHTML=documento(d,hoy);
+}
+// Lo que se le pasa a la nota (mismo sitio: se comparte por localStorage, sin datos en la liga)
+$('btnNota').onclick=()=>{
+  const {d,r}=S.res;
+  store.set('yp_handoff',JSON.stringify({desde:'consentimiento',id_consent:r.id_consent,id_clienta:r.id_clienta,
+    apodo:d.persona.apodo,email:d.persona.email,perforaciones:r.perforaciones.map(x=>({id_perfo:x.id_perfo,sku_serv:x.sku_serv,zona:x.zona,lado:x.lado}))}));
+  if(!DEMO)location.href=CFG.notas+'?desde=consentimiento';
+  else $('notaDemo').scrollIntoView({behavior:'smooth',block:'center'});
+};
+function documento(d,hoy){
+  const p=d.persona,s=d.salud,t=p.tutor;
+  const perf=perfTxt();
+  const fnTxt=p.fecha_nacimiento.split('-').reverse().join('/');
+  return `<h3>Consentimiento informado</h3><h4>para procedimiento de perforación</h4>
+  <div>Fecha: <b>${fmt(hoy)}</b> · Lugar: <b>${esc(d.lugar)}</b> · Atendió: <b>${esc(d.atiende.alias)}</b></div>
+  <table>
+    <tr><td class="sec" colspan="3">Datos personales</td></tr>
+    <tr><td>Nombre: ${esc(p.nombre_completo)}</td><td>Fecha de nacimiento: ${esc(fnTxt)}</td><td>WhatsApp: ${esc(p.whatsapp)}</td></tr>
+    <tr><td colspan="2">Perforación: ${esc(perf)}</td><td>Tipo de sangre: ${esc(s.tipo_sangre)}</td></tr>
+    <tr><td>Enfermedades: ${esc(s.enfermedades.join(', '))}</td><td>Condiciones: ${esc(s.condiciones.join(', '))}</td><td>Fobias: ${esc(s.fobias.join(', '))}</td></tr>
+    <tr><td>Alergias: ${esc(s.alergias||'Ninguna')}</td><td colspan="2">Medicamentos: ${esc(s.medicamentos||'Ninguno')}</td></tr>
+    <tr><td class="sec" colspan="3">En caso de ser menor de edad</td></tr>
+    <tr><td>Tutor: ${esc(t?t.nombre:'-')}</td><td>Parentesco: ${esc(t?t.parentesco:'-')}</td><td>Teléfono: ${esc(t?t.whatsapp:'-')}</td></tr>
+  </table>
+  ${$('textoConsent').innerHTML}
+  <div class="marca">
+    <span>☑ Acepto el procedimiento y el uso de mis datos de salud para mi seguridad.</span>
+    <span>${d.autorizaciones.fotos?'☑ Autorizo':'☐ No autorizo'} la publicación de fotos de mi perforación en redes sociales.</span>
+  </div>
+  <div class="firma"><img src="${d.firma.png}" alt="Firma"><div class="ln">${esc(d.firma.nombre)}${d.firma.firmante==='Tutor'?' (tutor)':''}</div></div>`;
+}
+const _show=show;
+show=function(n){_show(n);if(n===9)listo();};
+function reiniciar(){
+  S.persona=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.fotos=S.manual=S.pink=null;S.firmaVacia=true;S.res=null;
+  document.querySelectorAll('input[type=text],input[type=tel],input[type=email],input[type=date],input[type=search],textarea').forEach(i=>i.value='');
+  document.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
+  $('sangre').value='';$('saludPrev').hidden=true;$('results').innerHTML='';
+  document.querySelectorAll('#segFotos .chip,#segManual .chip').forEach(b=>b.setAttribute('aria-pressed','false'));
+  $('perforadora').value=S.perfoAuto||'';
+  pintarChips();ctx.clearRect(0,0,cv.width,cv.height);$('sigph').hidden=false;show(1);
+}
+
+// ── Inicio ───────────────────────────────────────────────────────────
+(async function iniciar(){
+  $('demoTag').hidden=!DEMO;
+  if(!DEMO){
+    try{await cargarConfig();}
+    catch(x){$('loading').textContent='No pude cargar el formulario: '+x.message+'. Revisa el internet y recarga.';return;}
+  }
+  llenarListas();
+  if(DEMO){if(!store.get('yp_lugar'))store.set('yp_lugar','Yiyipash Studio');if(!store.get('yp_elaboro_alias')){store.set('yp_elaboro_id','ART-001');store.set('yp_elaboro_alias','Yiyi');}}
+  const lg=store.get('yp_lugar'),enLista=[...$('lugar').options].some(o=>o.value===lg);
+  if(lg){$('lugar').value=enLista?lg:'Otro';$('lugarOtro').value=store.get('yp_lugar_otro')||(enLista?'':lg);$('lugar').onchange();}
+  const al=store.get('yp_elaboro_alias');
+  if(al)[...$('atiende').options].forEach(o=>{if(o.textContent===al)o.selected=true;});
+  S.perfoAuto=CFG.perforadoras.some(p=>p.alias===al)?al:((CFG.perforadoras[0]||{}).alias||'');
+  $('perforadora').value=S.perfoAuto;
+  $('claveWrap').hidden=DEMO||!!store.get('yp_pink_clave');
+  where();
+  $('loading').hidden=true;
+  const listo0=lg&&enLista&&al&&(DEMO||store.get('yp_pink_clave'));
+  show(listo0?1:0);
+})();
+</script>
