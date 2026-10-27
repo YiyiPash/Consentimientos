@@ -131,6 +131,29 @@ canvas#sig{display:block;width:100%;height:200px;border-radius:10px;cursor:cross
 .doc .firma img{max-width:220px;height:auto;display:block;margin:0 auto -6px}
 .doc .firma .ln{border-top:1px solid #111;width:70%;margin:0 auto;padding-top:3px}
 .doc .marca{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:11px}
+/* Campo que falta: se marca en rojo y se lleva la vista ahí */
+.bad,input.bad,select.bad,textarea.bad{border-color:var(--bad)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 22%,transparent)}
+.card.bad,.perfo.bad,.sigwrap.bad,label.check.bad{border:1.5px solid var(--bad);border-radius:12px}
+label.check.bad{padding:6px}
+/* Zona elegida */
+.zone[aria-pressed="true"]{border-color:var(--accent);background:var(--soft)}
+.zone small.sel{color:var(--accent);font-weight:600}
+/* Ventanita para elegir el lado, abre abajo, junto al dedo */
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center}
+.sheet-in{background:var(--surface);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.sheet-in h2{margin:0;font-size:18px;color:var(--fg)}
+.sheet-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sheet-btns .btn{padding:14px 6px}
+/* Aviso corto que aparece abajo */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:25;max-width:min(92vw,480px);
+  background:var(--fg);color:var(--bg);border-radius:12px;padding:10px 14px;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+.toast.err{background:var(--bad);color:#fff}
+/* Resumen antes de firmar */
+.acepta{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.acepta div{display:flex;gap:8px;align-items:flex-start}
+.acepta .si{color:var(--ok);font-weight:700}
+.acepta .no{color:var(--mu);font-weight:700}
+.pdfwait{opacity:.6;pointer-events:none}
 @media (max-width:380px){.row{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){.step{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
 </style>
@@ -175,9 +198,10 @@ canvas#sig{display:block;width:100%;height:200px;border-radius:10px;cursor:cross
   <section class="step" data-step="2" data-part="team" data-name="Perforaciones">
     <h1>¿Qué se va a perforar?</h1>
     <p class="hint" id="perfHint">Toca la zona. La pieza se elige después, en la nota.</p>
-    <div id="perfos" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
-    <div class="card"><div id="zonas" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="card" id="zonasCard"><div id="zonas" style="display:flex;flex-direction:column;gap:10px"></div>
       <button class="btn sec" type="button" id="btnOtraZona">+ Otra zona (escribirla)</button></div>
+    <h2 class="zgroup" id="perfosTit" hidden style="margin:0 0 8px">Elegidas</h2>
+    <div id="perfos" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
     <div class="card">
       <label class="f">¿Quién perfora?<select id="perforadora"></select></label>
       <label class="f">Notas del equipo <span class="opc">(opcional, solo las ve el equipo)</span><textarea id="notasEquipo" placeholder="Algo que no esté contemplado arriba"></textarea></label>
@@ -259,8 +283,10 @@ canvas#sig{display:block;width:100%;height:200px;border-radius:10px;cursor:cross
   <section class="step" data-step="7" data-part="client" data-name="Firma">
     <h1>Firma</h1>
     <p class="hint" id="firmaHint">Firma con el dedo dentro del recuadro.</p>
-    <div class="card"><dl class="summary" id="resumen"></dl></div>
-    <div class="sigwrap"><canvas id="sig"></canvas><div class="sigline"></div><div class="sigph" id="sigph">Firma aquí</div></div>
+    <div class="card"><h2>Tus datos</h2><dl class="summary" id="resumen"></dl></div>
+    <div class="card"><h2>Lo que aceptas</h2><div class="acepta" id="aceptas"></div>
+      <p class="hint" style="margin:0">Si algo no es correcto, toca "Atrás" y cámbialo.</p></div>
+    <div class="sigwrap" id="sigwrap"><canvas id="sig"></canvas><div class="sigline"></div><div class="sigph" id="sigph">Firma aquí</div></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
       <span class="hint" style="margin:0" id="firmante"></span>
       <button class="btn sec small" type="button" id="limpiar">Borrar firma</button>
@@ -305,6 +331,16 @@ canvas#sig{display:block;width:100%;height:200px;border-radius:10px;cursor:cross
 
   <p class="err" id="err"></p>
 </div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sheetTit">
+    <h2 id="sheetTit"></h2>
+    <p class="hint" style="margin:0">¿De qué lado?</p>
+    <div class="sheet-btns" id="sheetBtns"></div>
+    <button class="btn sec" type="button" id="sheetCancel">Cancelar</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <footer class="nav"><div class="in">
   <button class="btn sec" type="button" id="back">Atrás</button>
@@ -418,59 +454,85 @@ function show(n){
 }
 function where(){ $('whereBtn').textContent=`${lugar()||'Sin lugar'} · ${atiende()} ✎`; }
 
-$('next').onclick=()=>{
-  const e=validar(S.step);if(e){$('err').textContent=e;return;}
+$('next').onclick=async()=>{
+  const e=validar(S.step);if(e)return falta(e);
   if(S.step===0)return guardarPaso0();
+  if(S.step===3&&!(await esperarDetalle()))return;
   if(S.step===7)return guardar();
+  if(S.step===8)return terminarGuardado();
   if(S.step===9)return reiniciar();
   show(S.step+1);
 };
+// Avisa qué falta, lleva la vista a ese campo y lo marca en rojo hasta que lo toquen
+let tToast=null;
+function toast(m,err){const t=$('toast');t.textContent=m;t.className='toast'+(err?' err':'');t.hidden=false;clearTimeout(tToast);tToast=setTimeout(()=>t.hidden=true,err?4500:2200);}
+function falta(e){
+  $('err').textContent=e.m;toast(e.m,true);
+  document.querySelectorAll('.bad').forEach(x=>x.classList.remove('bad'));
+  const el=typeof e.el==='string'?$(e.el):e.el;if(!el)return;
+  const box=el.matches('input[type=checkbox]')?el.closest('label'):el;
+  box.classList.add('bad');
+  box.scrollIntoView({behavior:'smooth',block:'center'});
+  if(el.matches('input:not([type=checkbox]),select,textarea'))setTimeout(()=>el.focus({preventScroll:true}),350);
+}
+['input','change','click'].forEach(t=>document.addEventListener(t,ev=>{const b=ev.target.closest&&ev.target.closest('.bad');if(b)b.classList.remove('bad');},true));
 $('back').onclick=()=>show(BACK_OK[S.step]);
 $('whereBtn').onclick=()=>show(0);
 
 async function guardarPaso0(){
-  if($('lugar').value==='Otro'&&!$('lugarOtro').value.trim())return $('err').textContent='Escribe el lugar.';
+  if($('lugar').value==='Otro'&&!$('lugarOtro').value.trim())return falta(F('Escribe el lugar.','lugarOtro'));
   if(!DEMO&&!store.get('yp_pink_clave')){
-    const c=$('clave').value.trim();if(!c)return $('err').textContent='Escribe la clave del equipo.';
+    const c=$('clave').value.trim();if(!c)return falta(F('Escribe la clave del equipo.','clave'));
     const b=$('next');b.disabled=true;
     try{store.set('yp_pink_clave',c);await api('pink_validar_clave');}
-    catch(x){$('err').textContent=x.message;return;}
+    catch(x){return falta(F(x.message,'clave'));}
     finally{b.disabled=false;}
+    cargarLista().catch(()=>{});
   }
   const o=$('atiende').selectedOptions[0];
   store.set('yp_lugar',$('lugar').value);store.set('yp_lugar_otro',$('lugarOtro').value.trim());
   store.set('yp_elaboro_id',o.value);store.set('yp_elaboro_alias',o.textContent);
   $('claveWrap').hidden=true;where();show(1);
 }
+// Regresa {m: mensaje, el: campo que falta} o null
+const F=(m,el)=>({m,el});
 function validar(n){
   if(n===2){
-    if(!S.perfos.length)return 'Elige al menos una zona.';
-    if(S.perfos.some(p=>!p.zona.trim()))return 'Escribe el nombre de la otra zona.';
-    if(S.perfos.some(p=>!p.lado))return 'Elige el lado de cada perforación.';
+    if(!S.perfos.length)return F('Elige al menos una zona.','zonasCard');
+    let i=S.perfos.findIndex(p=>!p.zona.trim());
+    if(i>=0)return F('Escribe el nombre de la otra zona.',document.querySelector(`[data-zt="${i}"]`));
+    i=S.perfos.findIndex(p=>!p.lado);
+    if(i>=0)return F(`Elige el lado de: ${S.perfos[i].zona}.`,'perfo'+i);
   }
   if(n===4){
     const e=edad($('fn').value);
-    if(!$('apodo').value.trim()||!$('nombre').value.trim())return 'Falta tu apodo o tu nombre completo.';
-    if(e===null||e<0||e>110)return 'Revisa tu fecha de nacimiento.';
-    if(dig($('wa').value).length!==10)return 'Tu WhatsApp debe tener 10 dígitos.';
-    if(e<18&&(!$('tnombre').value.trim()||!$('tpar').value.trim()||dig($('twa').value).length!==10))return 'Faltan los datos de tu tutor (nombre, parentesco y WhatsApp).';
-    if(e<12&&edad($('tfn').value)===null)return 'Falta la fecha de nacimiento de tu tutor.';
+    if(!$('apodo').value.trim())return F('Falta cómo te gusta que te digan.','apodo');
+    if(e===null||e<0||e>110)return F('Revisa tu fecha de nacimiento.','fn');
+    if(!$('nombre').value.trim())return F('Falta tu nombre completo.','nombre');
+    if(dig($('wa').value).length!==10)return F('Tu WhatsApp debe tener 10 dígitos.','wa');
+    if(e<18){
+      if(!$('tnombre').value.trim())return F('Falta el nombre de tu tutor.','tnombre');
+      if(!$('tpar').value.trim())return F('Falta el parentesco de tu tutor.','tpar');
+      if(dig($('twa').value).length!==10)return F('El WhatsApp de tu tutor debe tener 10 dígitos.','twa');
+    }
+    if(e<12&&edad($('tfn').value)===null)return F('Falta la fecha de nacimiento de tu tutor.','tfn');
   }
   if(n===5){
-    if(!$('sangre').value)return 'Elige tu tipo de sangre (o "No sé").';
-    if(!S.salud.enf.length&&!$('enfOtra').value.trim())return 'Marca tus enfermedades o "Ninguna".';
-    if(!S.salud.cond.length&&!$('condOtra').value.trim())return 'Marca tus condiciones o "Ninguna".';
-    if(!S.salud.fob.length)return 'Marca tus miedos o "Ninguno".';
+    if(!$('sangre').value)return F('Elige tu tipo de sangre (o "No sé").','sangre');
+    if(!S.salud.enf.length&&!$('enfOtra').value.trim())return F('Marca tus enfermedades o "Ninguna".',$('enf').closest('.card'));
+    if(!S.salud.cond.length&&!$('condOtra').value.trim())return F('Marca tus condiciones o "Ninguna".',$('cond').closest('.card'));
+    if(!S.salud.fob.length)return F('Marca tus miedos o "Ninguno".',$('fob').closest('.card'));
   }
   if(n===6){
-    if(!$('aLeido').checked||!$('aSalud').checked)return 'Las dos primeras casillas son obligatorias.';
-    if(!S.fotos)return 'Falta contestar lo de las fotos.';
-    if(!S.manual)return 'Falta contestar lo del manual de cuidados.';
-    if(!(S.persona&&S.persona.pink)&&!S.pink)return 'Falta contestar si quieres unirte al Pink Club.';
-    if(S.pink==='si'&&!$('pAviso').checked)return 'Para el Pink Club debes aceptar el aviso de privacidad y los términos.';
+    if(!$('aLeido').checked)return F('Falta aceptar el consentimiento (es obligatorio).','aLeido');
+    if(!$('aSalud').checked)return F('Falta autorizar el uso de tus datos de salud (es obligatorio).','aSalud');
+    if(!S.fotos)return F('Falta contestar lo de las fotos.','segFotos');
+    if(!S.manual)return F('Falta contestar lo del manual de cuidados.','segManual');
+    if(!(S.persona&&S.persona.pink)&&!S.pink)return F('Falta contestar si quieres unirte al Pink Club.','pinkCard');
+    if(S.pink==='si'&&!$('pAviso').checked)return F('Para el Pink Club debes aceptar el aviso de privacidad y los términos.','pAviso');
   }
-  if(n===7&&S.firmaVacia)return 'Falta la firma.';
-  return '';
+  if(n===7&&S.firmaVacia)return F('Falta la firma.','sigwrap');
+  return null;
 }
 
 // ── Paso 0 ───────────────────────────────────────────────────────────
@@ -483,31 +545,60 @@ $('lugar').onchange=()=>{$('lugarOtroWrap').hidden=$('lugar').value!=='Otro';};
 
 // ── Paso 1: buscar ───────────────────────────────────────────────────
 const norm=s=>String(s||'').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim();
-let hits=[],tBuscar=null;
-$('q').addEventListener('input',()=>{
-  clearTimeout(tBuscar);
-  const raw=$('q').value.trim(),q=norm(raw),qd=dig(q);
-  if(q.length<3){$('results').innerHTML='';return;}
-  tBuscar=setTimeout(async()=>{
-    if(DEMO)hits=DEMO_PERSONAS.filter(p=>norm(p.nombre).includes(q)||norm(p.apodo).includes(q)||(qd.length>=4&&p.wa.includes(qd)));
-    else{
-      $('results').innerHTML='<p class="hint" style="margin:0">Buscando…</p>';
-      try{const d=await api('consent_buscar',{q:raw});if($('q').value.trim()!==raw)return;hits=d.resultados;}
-      catch(x){$('results').innerHTML=`<p class="err">${esc(x.message)}</p>`;return;}
-    }
-    $('results').innerHTML=hits.length?hits.map((p,i)=>`<button class="result" type="button" data-i="${i}">
-        <span><b>${esc(p.apodo)} · ${esc(p.nombre)}</b><small>${esc(p.id)} · WhatsApp …${esc(String(p.wa).slice(-4))}${p.ultima&&p.ultima.fecha?' · última visita '+fmt(new Date(p.ultima.fecha+'T12:00')):''}</small></span>
-        ${p.pink?'<span class="pill pink">Pink</span>':''}</button>`).join('')
-      :'<p class="hint" style="margin:0">No la encontré. Puede ser nueva.</p>';
-    $('results').querySelectorAll('.result').forEach(b=>b.onclick=()=>elegir(hits[+b.dataset.i]));
-  },DEMO?0:400);
-});
+// La lista de clientas (sin salud) se baja una vez y se busca en el celular: es instantáneo.
+let LISTA=null,listaProm=null,hits=[];
+function cargarLista(){
+  if(DEMO){LISTA=DEMO_PERSONAS;return Promise.resolve();}
+  if(!listaProm)listaProm=api('consent_lista').then(d=>{LISTA=d.personas;},x=>{listaProm=null;throw x;});
+  return listaProm;
+}
+$('q').addEventListener('input',buscar);
+async function buscar(){
+  const raw=$('q').value.trim(),q=norm(raw),qd=dig(raw),qu=raw.toUpperCase();
+  if(q.length<2){$('results').innerHTML='';return;}
+  if(!LISTA){
+    $('results').innerHTML='<p class="hint" style="margin:0">Cargando la lista de clientas…</p>';
+    try{await cargarLista();}catch(x){$('results').innerHTML=`<p class="err">${esc(x.message)}</p>`;return;}
+    if($('q').value.trim()!==raw)return;
+  }
+  hits=LISTA.filter(p=>p.id===qu||norm(p.nombre).includes(q)||norm(p.apodo).includes(q)||(qd.length>=4&&String(p.wa).includes(qd))).slice(0,15);
+  $('results').innerHTML=hits.length?hits.map((p,i)=>`<button class="result" type="button" data-i="${i}">
+      <span><b>${esc(p.apodo)} · ${esc(p.nombre)}</b><small>${esc(p.id)} · WhatsApp …${esc(String(p.wa).slice(-4))}</small></span>
+      ${p.pink?'<span class="pill pink">Pink</span>':''}</button>`).join('')
+    :'<p class="hint" style="margin:0">No la encontré. Puede ser nueva.</p>';
+  $('results').querySelectorAll('.result').forEach(b=>b.onclick=()=>elegir(hits[+b.dataset.i]));
+}
+function limpiarClienta(){
+  ['apodo','nombre','fn','wa','email','tnombre','tpar','twa','tfn','alergias','meds','coment','enfOtra','condOtra'].forEach(id=>$(id).value='');
+  $('sangre').value='';S.salud={enf:[],cond:[],fob:[]};$('saludPrev').hidden=true;pintarChips();
+}
+// Al elegirla se sigue de inmediato; sus datos completos (fecha, tutor, salud) llegan mientras el equipo elige zonas.
 function elegir(p){
+  limpiarClienta();
+  S.persona=Object.assign({},p);
+  $('apodo').value=p.apodo;$('nombre').value=p.nombre;$('wa').value=p.wa;
+  $('datosTit').textContent=`Hola de nuevo, ${p.apodo} 💗`;
+  $('datosHint').textContent='Revisa que tus datos sigan igual.';
+  pedirDetalle(p.id);
+  show(2);
+}
+function pedirDetalle(id){
+  S.detalle=(DEMO?Promise.resolve(DEMO_PERSONAS.find(x=>x.id===id)):api('consent_detalle',{id}))
+    .then(d=>{if(S.persona&&S.persona.id===d.id)llenarDetalle(d);S.detalle=null;});
+  S.detalle.catch(()=>{});
+}
+// Antes de pasarle el celular, sus datos ya deben estar puestos
+async function esperarDetalle(){
+  if(!S.detalle)return true;
+  const b=$('next');b.disabled=true;b.textContent='Cargando sus datos…';
+  try{await S.detalle;return true;}
+  catch(x){$('err').textContent='No pude traer sus datos: '+x.message+'. Toca de nuevo para reintentar.';pedirDetalle(S.persona.id);return false;}
+  finally{b.disabled=false;b.textContent='Soy la clienta, empezar';}
+}
+function llenarDetalle(p){
   S.persona=p;
   $('apodo').value=p.apodo;$('nombre').value=p.nombre;$('fn').value=p.fn;$('wa').value=p.wa;$('email').value=p.email||'';
   if(p.tutor){$('tnombre').value=p.tutor.nombre;$('tpar').value=p.tutor.par;$('twa').value=p.tutor.wa;}
-  $('datosTit').textContent=`Hola de nuevo, ${p.apodo} 💗`;
-  $('datosHint').textContent='Revisa que tus datos sigan igual.';
   revisarEdad();
   if(p.ultima){
     const u=p.ultima;
@@ -525,10 +616,9 @@ function elegir(p){
     $('saludPrev').innerHTML=`Esto es lo que nos dijiste el <b>${fmt(new Date(u.fecha+'T12:00'))}</b>. Cambia lo que ya no sea igual.`;
     pintarChips();
   }
-  show(2);
 }
 $('btnNueva').onclick=()=>{
-  S.persona=null;['apodo','nombre','fn','wa','email','tnombre','tpar','twa','tfn'].forEach(id=>$(id).value='');
+  S.persona=null;S.detalle=null;limpiarClienta();
   $('datosTit').textContent='Tus datos';$('datosHint').textContent='Con esto te creamos tu ID de clienta.';
   revisarEdad();show(2);
 };
@@ -547,15 +637,36 @@ function renderZonas(){
     CFG.zonas.filter(z=>z.g===g).map(z=>`<button class="zone" type="button" data-z="${esc(z.z)}">${esc(z.z)}</button>`).join('')}</div>`).join('');
   $('zonas').querySelectorAll('.zone').forEach(b=>b.onclick=()=>{
     const z=zona(b.dataset.z),lados=z.lados||CFG.ladosDefault;
-    S.perfos.push({zona:z.z,lado:lados.length===1?lados[0]:'',serv:z.serv,custom:false});
-    renderPerfos();
+    if(lados.length===1)return agregarZona(z,lados[0]);
+    // Varios lados: se pregunta ahí mismo, en una ventanita abajo
+    $('sheetTit').textContent=z.z;
+    $('sheetBtns').innerHTML=lados.map(l=>`<button class="btn" type="button" data-l="${esc(l)}">${esc(l)}</button>`).join('');
+    $('sheetBtns').querySelectorAll('button').forEach(x=>x.onclick=()=>{$('sheet').hidden=true;agregarZona(z,x.dataset.l);});
+    $('sheet').hidden=false;$('sheetBtns').querySelector('button').focus();
   });
   renderPerfos();
 }
+$('sheetCancel').onclick=()=>$('sheet').hidden=true;
+$('sheet').onclick=e=>{if(e.target===$('sheet'))$('sheet').hidden=true;};
+const ladoTxt=l=>l==='Centro'?'(centro)':l.toLowerCase();
+function agregarZona(z,lado){
+  S.perfos.push({zona:z.z,lado,serv:z.serv,custom:false});
+  renderPerfos();toast(`Agregado: ${z.z} ${ladoTxt(lado)}`);
+}
+// En cada botón de zona se ve lo que ya se eligió
+function marcarZonas(){
+  $('zonas').querySelectorAll('.zone').forEach(b=>{
+    const sel=S.perfos.filter(p=>!p.custom&&p.zona===b.dataset.z).map(p=>p.lado||'¿lado?');
+    b.setAttribute('aria-pressed',sel.length>0);
+    b.innerHTML=esc(b.dataset.z)+(sel.length?`<small class="sel">✓ ${esc(sel.join(', '))}</small>`:'');
+  });
+}
 function renderPerfos(){
+  marcarZonas();
+  $('perfosTit').hidden=!S.perfos.length;
   $('perfos').innerHTML=S.perfos.map((p,i)=>{
     const lados=ladosDe(p);
-    return `<div class="perfo">
+    return `<div class="perfo" id="perfo${i}">
       <div class="perfo-h">${p.custom?`<input type="text" data-zt="${i}" value="${esc(p.zona)}" placeholder="Nombre de la zona" style="flex:1">`:`<b>${esc(p.zona)}</b>`}<button class="x" type="button" data-del="${i}">Quitar</button></div>
       ${p.custom?`<label class="f">Servicio para la nota<select data-sv="${i}"><option value="">Sin servicio</option>${Object.keys(CFG.servicios).map(k=>`<option value="${esc(k)}"${p.serv===k?' selected':''}>${esc(servNom(k))}</option>`).join('')}</select></label>`:''}
       ${lados.length===1?`<span class="hint" style="margin:0">Solo se hace al ${esc(lados[0].toLowerCase())}.</span>`
@@ -654,7 +765,24 @@ function renderResumen(){
   const f=firmante();
   $('firmante').textContent=`Firma: ${f.nombre}${f.quien==='Tutor'?' (tutor)':''}`;
   $('firmaHint').textContent=f.quien==='Tutor'?'Como eres menor de edad, firma tu mamá, papá o tutor.':'Firma con el dedo dentro del recuadro.';
-  $('resumen').innerHTML=`<dt>Nombre</dt><dd>${esc($('nombre').value)}</dd><dt>Perforación</dt><dd>${esc(perfTxt())}</dd><dt>Fotos en redes</dt><dd>${S.fotos==='si'?'Sí autorizo':'No autorizo'}</dd>`;
+  const e=edad($('fn').value),fnTxt=$('fn').value.split('-').reverse().join('/');
+  const filas=[['Nombre',$('nombre').value],['Te decimos',$('apodo').value],['Nacimiento',`${fnTxt} (${e} años)`],
+    ['WhatsApp',$('wa').value],['Correo',$('email').value||'—'],['Perforación',perfTxt()]];
+  if(e<18)filas.push(['Tutor',`${$('tnombre').value} (${$('tpar').value}) · ${$('twa').value}`]);
+  $('resumen').innerHTML=filas.map(([a,b])=>`<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('');
+  // Todo lo que aceptó o no, para que lo vea antes de firmar
+  const si=t=>`<div><span class="si">✓</span><span>${t}</span></div>`,no=t=>`<div><span class="no">✗</span><span>${t}</span></div>`;
+  const yaPink=S.persona&&S.persona.pink,wa=e<18?$('twa').value:$('wa').value;
+  const a=[si('Leí el consentimiento, me aclararon mis dudas y acepto el procedimiento.'),
+    si('Autorizo que Yiyi Pash use mis datos de salud solo para mi seguridad.'),
+    S.fotos==='si'?si('Autorizo publicar fotos de mi perforación en redes.'):no('<b>No</b> autorizo publicar fotos de mi perforación.'),
+    S.manual==='si'?si(`Quiero el manual de cuidados por WhatsApp al <b>${esc(wa)}</b>.`):no('<b>No</b> quiero el manual de cuidados por WhatsApp.')];
+  if(yaPink)a.push(si('Ya soy del Pink Club: lo que compre hoy suma puntos.'));
+  else if(S.pink==='si'){
+    a.push(si('Me uno al Pink Club y acepto el aviso de privacidad y los términos.'));
+    if(e>=18)a.push($('pMkt')&&$('pMkt').checked?si('Quiero recibir promociones por WhatsApp.'):no('<b>No</b> quiero promociones por WhatsApp.'));
+  }else a.push(no('<b>No</b> me uno al Pink Club por ahora.'));
+  $('aceptas').innerHTML=a.join('');
 }
 
 // ── Guardar ──────────────────────────────────────────────────────────
@@ -672,20 +800,51 @@ function payload(){
       pink:S.persona&&S.persona.pink?'ya_es':S.pink,aviso:S.pink==='si'&&$('pAviso').checked,marketing_wa:!!($('pMkt')&&$('pMkt').checked)},
     firma:{firmante:f.quien,nombre:f.nombre,png:firmaPNG()}};
 }
-async function guardar(){
-  const btn=$('next');btn.disabled=true;btn.textContent='Guardando…';
-  const data=payload();
-  try{
-    let r;
-    if(DEMO){await new Promise(ok=>setTimeout(ok,600));
-      const id=data.persona.id_clienta||'NUE-0001';
-      r={id_clienta:id,id_consent:'CON-000001',nueva:!data.persona.id_clienta,pink_id:data.autorizaciones.pink==='si'?id:'',
-         perforaciones:data.perforaciones.map((p,i)=>({...p,id_perfo:'PER-00000'+(i+1)}))};}
-    else r=await api('consent_guardar',data);
-    S.res={d:data,r};
-    $('graciasTit').textContent=`¡Gracias, ${data.persona.apodo}!`;
-    show(8);
-  }catch(x){$('err').textContent=x.message;btn.disabled=false;}
+// La clienta ve "¡Gracias!" de inmediato; se guarda mientras regresa el celular.
+function guardar(){
+  S.payload=payload();S.res=null;S.errGuardar=null;
+  $('graciasTit').textContent=`¡Gracias, ${S.payload.persona.apodo}!`;
+  show(8);enviar();
+}
+function enviar(){
+  const data=S.payload;
+  const p=DEMO?new Promise(ok=>setTimeout(()=>{const id=data.persona.id_clienta||'NUE-0001';
+      ok({id_clienta:id,id_consent:'CON-000001',nueva:!data.persona.id_clienta,pink_id:data.autorizaciones.pink==='si'?id:'',
+        perforaciones:data.perforaciones.map((p,i)=>({...p,id_perfo:'PER-00000'+(i+1)}))});},600))
+    :api('consent_guardar',data);
+  S.guardando=p.then(r=>{S.res={d:data,r};agregarALista(data,r);pedirPdf(r.id_consent,data.firma.png);},x=>{S.errGuardar=x;});
+}
+async function terminarGuardado(){
+  const b=$('next');
+  if(S.errGuardar){S.errGuardar=null;enviar();}            // reintento
+  if(!S.res){b.disabled=true;b.textContent='Guardando…';await S.guardando;b.disabled=false;}
+  if(S.errGuardar){b.textContent='Reintentar guardar';$('err').textContent='No se guardó: '+S.errGuardar.message+'. Revisa el internet y vuelve a tocar.';return;}
+  show(9);
+}
+// La clienta nueva entra a la lista para la próxima búsqueda
+function agregarALista(d,r){
+  if(!LISTA||DEMO||LISTA.some(x=>x.id===r.id_clienta))return;
+  LISTA.push({id:r.id_clienta,apodo:d.persona.apodo,nombre:d.persona.nombre_completo,wa:d.persona.whatsapp,pink:r.pink_id?{estado:'Registrada'}:null});
+}
+// PDF: se pide aparte. Queda anotado en el celular hasta que el servidor confirma, y se reintenta al abrir el formulario.
+const PDF_PEND='yp_pdf_pend';
+const pdfPend=()=>{try{return JSON.parse(store.get(PDF_PEND)||'[]')}catch(e){return []}};
+const quitarPend=id=>store.set(PDF_PEND,JSON.stringify(pdfPend().filter(x=>x.id!==id)));
+function pedirPdf(id,png){
+  if(DEMO){S.pdf={id,estado:'demo'};return pintarPdf();}
+  store.set(PDF_PEND,JSON.stringify([...pdfPend().filter(x=>x.id!==id),{id,png}].slice(-10)));
+  S.pdf={id,estado:'armando'};pintarPdf();
+  api('consent_pdf',{id_consent:id,firma:png}).then(r=>{quitarPend(id);if(S.pdf&&S.pdf.id===id){S.pdf={id,estado:'ok',url:r.url_pdf};pintarPdf();}},
+    x=>{if(S.pdf&&S.pdf.id===id){S.pdf={id,estado:'error',png,msg:x.message};pintarPdf();}});
+}
+function reintentarPdfs(){pdfPend().forEach(x=>api('consent_pdf',{id_consent:x.id,firma:x.png}).then(()=>quitarPend(x.id),()=>{}));}
+function pintarPdf(){
+  const b=$('pdfBtn'),p=S.pdf;if(!b)return;
+  b.hidden=!p||p.estado==='demo';b.classList.toggle('pdfwait',!!p&&p.estado==='armando');b.onclick=null;b.removeAttribute('href');
+  if(!p)return;
+  if(p.estado==='armando')b.textContent='Armando el PDF firmado…';
+  if(p.estado==='ok'){b.textContent='Ver el PDF firmado';b.href=p.url;}
+  if(p.estado==='error'){b.textContent='No se armó el PDF. Tocar para reintentar';b.onclick=e=>{e.preventDefault();pedirPdf(p.id,p.png);};}
 }
 // Pantalla final del equipo
 function listo(){
@@ -720,7 +879,7 @@ function listo(){
   const msg=`Hola ${p.apodo} 💗 Gracias por perforarte en Yiyi Pash. Aquí está tu manual de cuidados: ${CFG.manual} Cualquier duda escríbenos por aquí.`;
   $('waBtn').href=`https://wa.me/52${wa}?text=${encodeURIComponent(msg)}`;
   $('waBtn').hidden=!d.autorizaciones.manual_whatsapp;
-  $('pdfBtn').hidden=!r.url_pdf;if(r.url_pdf)$('pdfBtn').href=r.url_pdf;
+  pintarPdf();
   $('doc').innerHTML=documento(d,hoy);
 }
 // Lo que se le pasa a la nota (mismo sitio: se comparte por localStorage, sin datos en la liga)
@@ -756,7 +915,7 @@ function documento(d,hoy){
 const _show=show;
 show=function(n){_show(n);if(n===9)listo();};
 function reiniciar(){
-  S.persona=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.fotos=S.manual=S.pink=null;S.firmaVacia=true;S.res=null;
+  S.persona=null;S.detalle=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.fotos=S.manual=S.pink=null;S.firmaVacia=true;S.res=null;S.pdf=null;
   document.querySelectorAll('input[type=text],input[type=tel],input[type=email],input[type=date],input[type=search],textarea').forEach(i=>i.value='');
   document.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
   $('sangre').value='';$('saludPrev').hidden=true;$('results').innerHTML='';
@@ -781,6 +940,7 @@ function reiniciar(){
   S.perfoAuto=CFG.perforadoras.some(p=>p.alias===al)?al:((CFG.perforadoras[0]||{}).alias||'');
   $('perforadora').value=S.perfoAuto;
   $('claveWrap').hidden=DEMO||!!store.get('yp_pink_clave');
+  if(DEMO||store.get('yp_pink_clave')){cargarLista().catch(()=>{});if(!DEMO)reintentarPdfs();}
   where();
   $('loading').hidden=true;
   const listo0=lg&&enLista&&al&&(DEMO||store.get('yp_pink_clave'));
