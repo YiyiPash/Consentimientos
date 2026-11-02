@@ -124,7 +124,7 @@ h1{font-family:var(--title);font-weight:400;font-size:26px;line-height:1.15;colo
   <div class="card" id="formVisita" hidden>
     <b style="font-size:17px">Anotar visita</b>
     <label class="campo">Tipo de visita<select id="vTipo"></select></label>
-    <div class="campo">¿Qué perforaciones revisaste?<div class="checks" id="vPerfos"></div></div>
+    <div class="campo">¿Qué revisaste?<div class="checks" id="vPerfos"></div></div>
     <label class="campo">¿Qué se vio?<textarea id="vObs" rows="3" placeholder="Ej. Se colocan aros por inflamación"></textarea></label>
     <div class="campo">¿Cómo quedan?<div class="chips" id="vEstado">
       <button class="chip" type="button" data-e="" aria-pressed="true">No cambia</button><button class="chip" type="button" data-e="Curando" aria-pressed="false">Curando</button>
@@ -202,7 +202,7 @@ function ficha(f){
   if(!ningun(f.medicamentos))alertas.push('Toma: '+f.medicamentos);
   const miedos=lista(f.fobias);
   const viejo=/^Migrado/.test(f.origen||'');                   // consentimientos del Form viejo: no preguntaba alergias ni medicamentos
-  const perfs=f.perforaciones.map(p=>`<div><span>${esc(p.zona)}${p.lado&&p.lado!=='Centro'?' '+esc(p.lado.toLowerCase()):''}</span><span>${esc(p.perforadora||'')}</span></div>`).join('');
+  const perfs=f.perforaciones.map(p=>`<div><span>${esc(p.zona)}${p.lado&&p.lado!=='Centro'?' '+esc(p.lado.toLowerCase()):''}${p.detalle?`<br><small style="color:var(--mu)">${esc(p.detalle)}</small>`:''}</span><span>${esc(p.perforadora||'')}</span></div>`).join('');
   return `<article class="card">
     <div class="top">
       <div class="nom"><b>${esc(f.apodo||f.nombre)}</b><small>${esc(f.nombre)} · ${esc(f.id_clienta)}</small></div>
@@ -292,12 +292,14 @@ function pintarExp(){
       +(miedos.length?`<div class="miedo" style="margin-top:6px">😰 Le da miedo: ${esc(miedos.join(', '))}</div>`:'')
       +`<p class="estado">Según su consentimiento del ${esc(fmtF(ult.fecha))}${ult.sangre?' · Sangre '+esc(ult.sangre):''}</p>`;
   }
+  const tats=(d.tatuajes||[]).map(x=>`<div class="perfo"><span>🖋️ ${esc(x.zona)}<small>${esc(fmtF(x.fecha))}${x.tatuadora?' · '+esc(x.tatuadora):''} · ${esc([x.dimensiones,x.color,x.tipo].filter(Boolean).join(' · '))}${x.prueba?' · alergia: '+esc(x.prueba):''}</small></span><span class="est ${esc(x.estado)}">${esc(x.estado||'—')}</span></div>`).join('');
   const perfos=d.perforaciones.map(x=>`<div class="perfo"><span>${esc(zonaTxt(x))}<small>${esc(fmtF(x.fecha))}${x.perforadora?' · '+esc(x.perforadora):''}</small></span><span class="est ${esc(x.estado)}">${esc(x.estado||'—')}</span></div>`).join('')||'<p class="estado">Sin perforaciones registradas.</p>';
   // Línea de tiempo: consentimientos y visitas, lo más nuevo arriba
-  const zonas=ids=>ids.split(',').map(s=>s.trim()).map(i=>d.perforaciones.find(x=>x.id===i)).filter(Boolean).map(zonaTxt).join(', ');
+  const todos=[...d.perforaciones,...(d.tatuajes||[]).map(t=>({...t,zona:'Tatuaje en '+t.zona,lado:''}))];
+  const zonas=ids=>ids.split(',').map(s=>s.trim()).map(i=>todos.find(x=>x.id===i)).filter(Boolean).map(zonaTxt).join(', ');
   const ev=[
     ...d.consentimientos.map(c=>({k:c.fecha+c.hora,h:`<div class="ev"><b>📄 Consentimiento</b> <span class="f">${esc(fmtF(c.fecha))} ${esc(c.hora)} · ${esc(c.lugar)}${c.atendio?' · atendió '+esc(c.atendio):''}</span>
-      ${d.perforaciones.filter(x=>x.id_consent===c.id).length?`<div>${esc(d.perforaciones.filter(x=>x.id_consent===c.id).map(zonaTxt).join(', '))}</div>`:''}
+      ${todos.filter(x=>x.id_consent===c.id).length?`<div>${esc(todos.filter(x=>x.id_consent===c.id).map(zonaTxt).join(', '))}</div>`:''}
       ${c.notas_equipo?`<div class="f">Nota del equipo: ${esc(c.notas_equipo)}</div>`:''}
       ${c.url_pdf?`<a href="${esc(c.url_pdf)}" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;font-size:13px">Ver PDF</a>`:''}</div>`})),
     ...d.visitas.map(v=>({k:v.fecha+v.hora,h:`<div class="ev"><b>🩺 ${esc(v.tipo)}</b> <span class="f">${esc(fmtF(v.fecha))} ${esc(v.hora)}${v.atendio?' · '+esc(v.atendio):''}</span>
@@ -315,6 +317,7 @@ function pintarExp(){
         <span class="pill">WhatsApp …${esc(p.wa4)}</span></div>
       ${salud}</div>
     <div class="sec2">Perforaciones</div>${perfos}
+    ${tats?`<div class="sec2">Tatuajes</div>${tats}`:''}
     <div class="sec2">Historia</div><div class="tl">${ev.map(x=>x.h).join('')||'<p class="estado">Sin historia.</p>'}</div>`;
 }
 // Ver una foto en grande (se pide al servidor; no se da acceso a Drive)
@@ -330,9 +333,10 @@ let vEstado='';
 $('btnAnotar').onclick=()=>{
   const d=E.d;if(!d)return;
   $('vTipo').innerHTML=d.tipos.map(t=>`<option>${esc(t)}</option>`).join('');
-  const activas=d.perforaciones.filter(x=>x.estado==='Curando');
-  $('vPerfos').innerHTML=d.perforaciones.length?d.perforaciones.map(x=>`<label><input type="checkbox" value="${esc(x.id)}"${activas.includes(x)?' checked':''}> ${esc(zonaTxt(x))} <small style="color:var(--mu)">(${esc(fmtF(x.fecha))})</small></label>`).join('')
-    :'<span class="estado">Sin perforaciones registradas.</span>';
+  const items=[...d.perforaciones,...(d.tatuajes||[]).map(t=>({...t,zona:'🖋️ Tatuaje en '+t.zona,lado:''}))];
+  const activas=items.filter(x=>x.estado==='Curando');
+  $('vPerfos').innerHTML=items.length?items.map(x=>`<label><input type="checkbox" value="${esc(x.id)}"${activas.includes(x)?' checked':''}> ${esc(zonaTxt(x))} <small style="color:var(--mu)">(${esc(fmtF(x.fecha))})</small></label>`).join('')
+    :'<span class="estado">Sin perforaciones ni tatuajes registrados.</span>';
   ['vObs','vAccion','vDias'].forEach(i=>$(i).value='');$('vFotos').value='';$('vErr').textContent='';
   vEstado='';$('vEstado').querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.e===''));
   $('formVisita').hidden=false;$('btnAnotar').hidden=true;$('formVisita').scrollIntoView({behavior:'smooth'});

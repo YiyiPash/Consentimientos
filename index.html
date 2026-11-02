@@ -143,6 +143,8 @@ label.check.bad{padding:6px}
 .acepta .si{color:var(--ok);font-weight:700}
 .acepta .no{color:var(--mu);font-weight:700}
 .pdfwait{opacity:.6;pointer-events:none}
+.lbl{font-size:12px;font-weight:600;color:var(--mu);letter-spacing:.3px}
+.positiva{background:#fde8e8;color:var(--bad);border-left:5px solid var(--bad);border-radius:10px;padding:8px 10px;font-size:14px}
 .leerbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .leerbtns .btn{padding:12px 8px;font-size:14px}
 .lector{position:fixed;inset:0;z-index:40;background:rgba(59,31,46,.45);display:flex;align-items:flex-end;justify-content:center}
@@ -195,15 +197,20 @@ label.check.bad{padding:6px}
     <button class="btn sec" type="button" id="btnNueva">Es nueva</button>
   </section>
 
-  <section class="step" data-step="2" data-part="team" data-name="Perforaciones">
-    <h1>¿Qué se va a perforar?</h1>
+  <section class="step" data-step="2" data-part="team" data-name="Qué se va a hacer">
+    <h1>¿Qué se va a hacer?</h1>
+    <div class="seg" id="segServicio" style="margin-bottom:12px"><button class="chip" type="button" data-v="Perforación" aria-pressed="true">💎 Perforación</button><button class="chip" type="button" data-v="Tatuaje" aria-pressed="false">🖋️ Tatuaje</button></div>
     <p class="hint" id="perfHint">Toca la zona. La pieza se elige después, en la nota.</p>
+    <div id="bloqueTat" hidden><div id="tats" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px"></div>
+      <button class="btn sec" type="button" id="btnOtroTat" style="margin-bottom:12px">+ Otro tatuaje</button></div>
+    <div id="bloquePerfo">
     <div class="card" id="zonasCard"><div id="zonas" style="display:flex;flex-direction:column;gap:10px"></div>
       <button class="btn sec" type="button" id="btnOtraZona">+ Otra zona (escribirla)</button></div>
     <h2 class="zgroup" id="perfosTit" hidden style="margin:0 0 8px">Elegidas</h2>
     <div id="perfos" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
+    </div>
     <div class="card">
-      <label class="f">¿Quién perfora?<select id="perforadora"></select></label>
+      <label class="f" id="perfoWrap">¿Quién perfora?<select id="perforadora"></select></label>
       <label class="f">Notas del equipo <span class="opc">(opcional, solo las ve el equipo)</span><textarea id="notasEquipo" placeholder="Algo que no esté contemplado arriba"></textarea></label>
     </div>
   </section>
@@ -389,7 +396,10 @@ const CFG={
   ladosTodos:['Izquierdo','Derecho','Ambos','Centro'],
   servicios:{'PIR-001':['Perforación oreja básica',140],'PIR-002':['Perforación oreja avanzada',160],'PIR-003':['Perforación nostril',160],'PIR-004':['Perforación septum',160],'PIR-005':['Perforación nipple',160],'PIR-006':['Perforación ceja',160],'PIR-007':['Perforación navy',160]},
   dias:{seguimiento:30,retiro:14},
+  tamanos:[{sku:'TAT-001',nombre:'Tatuaje Pequeño (<5cm)',precio:500},{sku:'TAT-002',nombre:'Tatuaje Mediano (5-15cm)',precio:1500},{sku:'TAT-003',nombre:'Tatuaje Grande (>15cm)',precio:4000}],
+  manual_tatuaje:'',
 };
+CFG.tamanos.forEach(x=>CFG.servicios[x.sku]=[x.nombre,x.precio]);
 // Demo fuera de GitHub (por ejemplo, la vista previa) o con ?demo en la liga
 const DEMO=!/\.github\.io$/.test(location.hostname)||/[?&]demo/.test(location.search);
 // Datos de ejemplo para el modo demo. En producción vienen del servidor.
@@ -404,7 +414,7 @@ const DEMO_PERSONAS=[
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dig=s=>String(s||'').replace(/\D/g,'');
-const S={step:0,persona:null,salud:{enf:[],cond:[],fob:[]},perfos:[],fotos:'si',manual:null,pink:null,firmaVacia:true,res:null};
+const S={step:0,persona:null,salud:{enf:[],cond:[],fob:[]},perfos:[],servicio:'Perforación',tats:[],fotos:'si',manual:null,pink:null,firmaVacia:true,res:null};
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const steps=[...document.querySelectorAll('.step')];
 const LAST=steps.length-1;
@@ -428,6 +438,8 @@ async function cargarConfig(){
   CFG.lugares=c.lugares;CFG.equipo=c.equipo;CFG.perforadoras=c.perforadoras;CFG.manual=c.manual;CFG.dias.seguimiento=c.dias.seguimiento;
   CFG.zonas=c.zonas.map(z=>({z:z.z,g:z.grupo,serv:z.serv,lados:z.lados||undefined}));
   CFG.servicios={};c.servicios.forEach(x=>CFG.servicios[x.sku]=[x.nombre,x.precio]);
+  CFG.tamanos=c.tamanos||[];CFG.tamanos.forEach(x=>CFG.servicios[x.sku]=[x.nombre,x.precio]);
+  CFG.textoP=c.texto;CFG.textoT=c.texto_tatuaje||c.texto;CFG.manual_tatuaje=c.manual_tatuaje||'';
   $('textoConsent').innerHTML=c.texto;
 }
 
@@ -458,7 +470,7 @@ function show(n){
   $('next').hidden=n===1;
   $('back').parentElement.style.gridTemplateColumns=($('back').hidden||$('next').hidden)?'1fr':'1fr 2fr';
   $('whereBtn').hidden=cli;
-  if(n===2)renderZonas();
+  if(n===2){renderZonas();ponerServicio(S.servicio);}
   if(n===3)renderHandoff();
   if(n===6)renderPink();
   if(n===7){setTimeout(sizeCanvas,0);renderResumen();}
@@ -510,7 +522,15 @@ async function guardarPaso0(){
 // Regresa {m: mensaje, el: campo que falta} o null
 const F=(m,el)=>({m,el});
 function validar(n){
-  if(n===2){
+  if(n===2&&esTat()){
+    for(let i=0;i<S.tats.length;i++){const t=S.tats[i],el=$('tat'+i);
+      if(t.prueba==='Positiva')return F('La prueba de alergia salió positiva: no se puede realizar el tatuaje.',el);
+      if(!t.zona.trim())return F('Escribe la zona del tatuaje.',el.querySelector('[data-k=zona]'));
+      if(!t.sku)return F('Elige el tamaño del tatuaje (para la nota).',el.querySelector('[data-k=sku]'));
+      if(!t.color)return F('Elige el color del tatuaje.',el);
+      if(!t.prueba)return F('Marca el resultado de la prueba de alergia.',el);}
+  }
+  if(n===2&&!esTat()){
     if(!S.perfos.length)return F('Elige al menos una zona.','zonasCard');
     let i=S.perfos.findIndex(p=>!p.zona.trim());
     if(i>=0)return F('Escribe el nombre de la otra zona.',document.querySelector(`[data-zt="${i}"]`));
@@ -641,6 +661,49 @@ function revisarEdad(){
 }
 $('fn').addEventListener('change',revisarEdad);
 
+// ── Paso 2: ¿perforación o tatuaje? ─────────────────────────────────
+const TAT_COLOR=['Negro','A color','Negro y color'],TAT_PRUEBA=['Negativa','Positiva','No se hizo'];
+const defTatuadora=()=>(CFG.perforadoras.find(x=>/^kat/i.test(x.alias))||CFG.perforadoras[0]||{}).alias||'';
+const nuevoTat=()=>({zona:'',dimensiones:'',sku:'',color:'',prueba:'',tipo:'Nuevo',tatuadora:defTatuadora()});
+const esTat=()=>S.servicio==='Tatuaje';
+function ponerServicio(v){
+  S.servicio=v;
+  $('segServicio').querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+  $('bloquePerfo').hidden=esTat();$('bloqueTat').hidden=!esTat();$('perfoWrap').hidden=esTat();
+  if(esTat()&&!S.tats.length)S.tats.push(nuevoTat());
+  $('perfHint').textContent=esTat()?'Llena los datos de cada tatuaje. Si la prueba de alergia sale positiva, no se puede continuar.'
+    :(S.persona?`Para ${S.persona.apodo}. Toca la zona; la pieza se elige después, en la nota.`:'Toca la zona. La pieza se elige después, en la nota.');
+  $('textoConsent').innerHTML=esTat()?(CFG.textoT||$('textoConsent').innerHTML):(CFG.textoP||$('textoConsent').innerHTML);
+  renderTats();
+}
+$('segServicio').querySelectorAll('.chip').forEach(b=>b.onclick=()=>ponerServicio(b.dataset.v));
+const chipT=(i,k,v,cur)=>`<button class="chip" type="button" data-ti="${i}" data-tk="${k}" data-tv="${esc(v)}" aria-pressed="${cur===v}">${esc(v)}</button>`;
+function renderTats(){
+  $('tats').innerHTML=S.tats.map((t,i)=>`<div class="perfo" id="tat${i}">
+    <div class="perfo-h"><b>🖋️ Tatuaje ${S.tats.length>1?i+1:''}</b>${S.tats.length>1?`<button class="x" type="button" data-tdel="${i}">Quitar</button>`:''}</div>
+    <label class="f">Zona del cuerpo<input type="text" data-t="${i}" data-k="zona" value="${esc(t.zona)}" placeholder="Ej. Antebrazo izquierdo"></label>
+    <div class="row"><label class="f">Dimensiones<input type="text" data-t="${i}" data-k="dimensiones" value="${esc(t.dimensiones)}" placeholder="Ej. 5 x 3 cm"></label>
+      <label class="f">Tamaño (para la nota)<select data-t="${i}" data-k="sku"><option value="">Elegir…</option>${CFG.tamanos.map(x=>`<option value="${esc(x.sku)}"${t.sku===x.sku?' selected':''}>${esc(x.nombre)}</option>`).join('')}</select></label></div>
+    <span class="lbl">Color</span><div class="chips">${TAT_COLOR.map(c=>chipT(i,'color',c,t.color)).join('')}</div>
+    <span class="lbl">Prueba de alergia</span><div class="chips">${TAT_PRUEBA.map(c=>chipT(i,'prueba',c,t.prueba)).join('')}</div>
+    ${t.prueba==='Positiva'?`<div class="positiva">⚠️ La prueba salió <b>positiva</b>: no se puede realizar el tatuaje.${S.persona?`<br><button class="btn sec small" type="button" data-tanota="${i}" style="margin-top:6px">Anotar en su expediente</button>`:''}</div>`:''}
+    <div class="row"><div><span class="lbl">¿Nuevo o retoque?</span><div class="chips">${['Nuevo','Retoque'].map(c=>chipT(i,'tipo',c,t.tipo)).join('')}</div></div>
+      <label class="f">¿Quién tatúa?<select data-t="${i}" data-k="tatuadora">${CFG.perforadoras.map(x=>`<option${t.tatuadora===x.alias?' selected':''}>${esc(x.alias)}</option>`).join('')}</select></label></div>
+  </div>`).join('');
+  $('tats').querySelectorAll('[data-t]').forEach(el=>{const f=()=>{S.tats[+el.dataset.t][el.dataset.k]=el.value;};el.oninput=f;el.onchange=f;});
+  $('tats').querySelectorAll('[data-ti]').forEach(b=>b.onclick=()=>{S.tats[+b.dataset.ti][b.dataset.tk]=b.dataset.tv;renderTats();});
+  $('tats').querySelectorAll('[data-tdel]').forEach(b=>b.onclick=()=>{S.tats.splice(+b.dataset.tdel,1);renderTats();});
+  $('tats').querySelectorAll('[data-tanota]').forEach(b=>b.onclick=async()=>{
+    const t=S.tats[+b.dataset.tanota];b.disabled=true;
+    try{
+      if(!DEMO)await api('consent_visita',{id_clienta:S.persona.id,tipo:'Prueba de alergia',obs:`Prueba de alergia positiva${t.zona?' ('+t.zona+')':''}: no se realizó el tatuaje.`,estado:'',
+        atiende:{id:store.get('yp_elaboro_id')||'',alias:store.get('yp_elaboro_alias')||''}});
+      toast('Anotado en su expediente');b.textContent='✓ Anotado';
+    }catch(x){toast(x.message,true);b.disabled=false;}
+  });
+}
+$('btnOtroTat').onclick=()=>{S.tats.push(nuevoTat());renderTats();};
+
 // ── Paso 2: zonas y lados ────────────────────────────────────────────
 function renderZonas(){
   $('perfHint').textContent=S.persona?`Para ${S.persona.apodo}. Toca la zona; la pieza se elige después, en la nota.`:'Toca la zona. La pieza se elige después, en la nota.';
@@ -725,10 +788,15 @@ $('textoConsent').innerHTML=`<b>Indicaciones previas</b><ul>
 <li>Informar si padece alguna condición médica preexistente (diabetes, problemas de coagulación, enfermedades de la piel, etc.).</li>
 <li>En caso de estar bajo tratamiento médico, informar previamente a la perforadora para revisar si se puede realizar el procedimiento.</li></ul>
 <b>Identificación de los productos a utilizar en el procedimiento</b><ul><li>Cánula o catéter nuevo, sellado y estéril.</li><li>Pieza desinfectada y estéril.</li><li>Guantes nuevos y estériles.</li><li>Paquete de limpieza nuevo, sellado y estéril.</li><li>Instrumental quirúrgico desinfectado y estéril.</li></ul>`;
+// Texto para tatuaje (en la demo; ya conectado viene del servidor)
+CFG.textoP=$('textoConsent').innerHTML;
+CFG.textoT=CFG.textoP.replace(/la perforación/g,'el tatuaje').replace(/a la perforadora/g,'a la tatuadora').replace(/<b>Identificación[\s\S]*$/,
+  '<b>Identificación de los productos a utilizar en el procedimiento</b><ul><li>Cartucho para tatuaje cerrado, nuevo y estéril.</li><li>Guantes de nitrilo nuevos.</li><li>Tinta vigente y de uso personal.</li><li>Material protegido con playo.</li><li>Máquina protegida con playo y venda elástica.</li></ul>');
 const DATOS_TXT='Los datos personales proporcionados en este documento serán tratados de manera confidencial y utilizados exclusivamente para los fines relacionados con la realización del procedimiento, según el aviso de privacidad de Yiyi Pash. No serán compartidos con terceros sin el consentimiento del titular, salvo en los casos previstos por la ley. Al firmar este documento, el titular o su tutor legal acepta el tratamiento de sus datos bajo estas condiciones.';
 // Declaración para mayores o para menores (aprobada por Luis el 27/10). Copia de consTextos() en Consentimiento.gs: si cambias una, cambia la otra.
 function declaracion(){
   const e=edad($('fn').value),menor=e!==null&&e<18,nombre=$('nombre').value.trim(),apodo=$('apodo').value.trim();
+  if(esTat())return declaracionTatuaje(e,menor,nombre,apodo);
   const al=$('perforadora').value,pf=CFG.perforadoras.find(x=>x.alias===al);
   const perfo=!al||al==='Otra persona'?'la perforadora':'la perforadora '+((pf&&pf.nombre)||al);
   const riesgos='Se me explicaron el proceso, los cuidados necesarios y los posibles riesgos, como infección, rechazo o cicatrización irregular.';
@@ -742,6 +810,22 @@ function declaracion(){
   return{d1:`Yo, ${nombre}, en pleno uso de mis facultades, declaro que conozco el procedimiento al que me someteré. Expresé mis dudas y me fueron aclaradas. ${riesgos}`,
     d2:`${material} Me comprometo a seguir las indicaciones de higiene y cuidados. ${resp}`,
     fotos:`${fotos} que Yiyi Pash publique fotos y videos de mi perforación en sus redes sociales.`};
+}
+// Copia de consTextosTatuaje() en Consentimiento.gs: si cambias una, cambia la otra.
+function declaracionTatuaje(e,menor,nombre,apodo){
+  const ps=[...new Set(S.tats.map(t=>t.tatuadora).filter(Boolean))].map(a=>(CFG.perforadoras.find(x=>x.alias===a)||{}).nombre||a);
+  const quien=ps.length>1?'las tatuadoras '+ps.slice(0,-1).join(', ')+' y '+ps[ps.length-1]:(ps.length?'la tatuadora '+ps[0]:'la tatuadora');
+  const riesgos='Se me explicaron el proceso, los cuidados necesarios y los posibles riesgos, como infección, reacción alérgica a la tinta o cicatrización irregular.';
+  const material='Confirmo que se me mostró el material nuevo y de uso personal (cartucho cerrado, nuevo y estéril; tinta vigente; guantes de nitrilo nuevos; material y máquina protegidos con playo), que será desechado después.';
+  const resp=`Entiendo y acepto que Yiyi Pash y ${quien} no son responsables de complicaciones posteriores. Ante cualquier duda durante la curación, contactaré a Yiyi Pash.`;
+  const fotos=S.fotos==='si'?'Autorizo':'No autorizo';
+  if(menor){const t=$('tnombre').value.trim(),par=$('tpar').value.trim().toLowerCase();
+    return{d1:`Yo, ${t}, en mi calidad de ${par} y tutor(a) legal de ${nombre}, de ${e} años, en pleno uso de mis facultades, autorizo que se le realice el tatuaje descrito en este documento. Declaro que conozco el procedimiento. Expresé mis dudas y me fueron aclaradas. ${riesgos}`,
+      d2:`${material} Estaré presente durante el procedimiento y me comprometo a vigilar que ${apodo||nombre} siga las indicaciones de higiene y cuidados. ${resp}`,
+      fotos:`${fotos} que Yiyi Pash publique fotos y videos del tatuaje de ${nombre} en sus redes sociales.`};}
+  return{d1:`Yo, ${nombre}, en pleno uso de mis facultades, declaro que conozco el procedimiento de tatuaje al que me someteré. Expresé mis dudas y me fueron aclaradas. ${riesgos}`,
+    d2:`${material} Me comprometo a seguir las indicaciones de higiene y cuidados. ${resp}`,
+    fotos:`${fotos} que Yiyi Pash publique fotos y videos de mi tatuaje en sus redes sociales.`};
 }
 function consentHTML(){const d=declaracion();
   return `${$('textoConsent').innerHTML}<b>Declaración</b><p>${esc(d.d1)}</p><p>${esc(d.d2)}</p>${S.fotos?`<p><b>${esc(d.fotos)}</b></p>`:''}<p><i>${esc(DATOS_TXT)}</i></p>`;}
@@ -812,14 +896,14 @@ function firmaPNG(){
 $('limpiar').onclick=()=>{ctx.clearRect(0,0,cv.width,cv.height);S.firmaVacia=true;$('sigph').hidden=false;};
 window.addEventListener('resize',()=>{if(S.step===7)sizeCanvas();});
 function firmante(){const e=edad($('fn').value);return e!==null&&e<18?{quien:'Tutor',nombre:$('tnombre').value.trim()}:{quien:'Clienta',nombre:$('nombre').value.trim()};}
-const perfTxt=()=>S.perfos.map(p=>`${p.zona}${p.lado==='Centro'?'':' '+p.lado.toLowerCase()}`).join(', ');
+const perfTxt=()=>esTat()?S.tats.map(t=>`Tatuaje en ${t.zona}${t.dimensiones?' ('+t.dimensiones+')':''}`).join(', '):S.perfos.map(p=>`${p.zona}${p.lado==='Centro'?'':' '+p.lado.toLowerCase()}`).join(', ');
 function renderResumen(){
   const f=firmante();
   $('firmante').textContent=`Firma: ${f.nombre}${f.quien==='Tutor'?' (tutor)':''}`;
   $('firmaHint').textContent=f.quien==='Tutor'?'Como eres menor de edad, firma tu mamá, papá o tutor.':'Firma con el dedo dentro del recuadro.';
   const e=edad($('fn').value),fnTxt=$('fn').value.split('-').reverse().join('/');
   const filas=[['Nombre',$('nombre').value],['Te decimos',$('apodo').value],['Nacimiento',`${fnTxt} (${e} años)`],
-    ['WhatsApp',$('wa').value],['Correo',$('email').value||'—'],['Perforación',perfTxt()]];
+    ['WhatsApp',$('wa').value],['Correo',$('email').value||'—'],[esTat()?'Tatuaje':'Perforación',perfTxt()]];
   if(e<18)filas.push(['Tutor',`${$('tnombre').value} (${$('tpar').value}) · ${$('twa').value}`]);
   $('resumen').innerHTML=filas.map(([a,b])=>`<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('');
   // Todo lo que aceptó o no, para que lo vea antes de firmar
@@ -847,7 +931,9 @@ function payload(){
       tutor:e<18?{id:S.persona&&S.persona.tutor?S.persona.tutor.id||'':'',nombre:$('tnombre').value.trim(),parentesco:$('tpar').value.trim(),whatsapp:dig($('twa').value),fecha_nacimiento:$('tfn').value}:null},
     salud:{tipo_sangre:$('sangre').value,enfermedades:[...S.salud.enf,$('enfOtra').value.trim()].filter(Boolean),condiciones:[...S.salud.cond,$('condOtra').value.trim()].filter(Boolean),
       fobias:S.salud.fob,alergias:$('alergias').value.trim(),medicamentos:$('meds').value.trim(),comentarios:$('coment').value.trim()},
-    perforaciones:perfosPorLado().map(p=>({zona:p.zona.trim(),lado:p.lado,sku_serv:p.serv||'',perforadora:$('perforadora').value})),
+    servicio:S.servicio,
+    perforaciones:esTat()?[]:perfosPorLado().map(p=>({zona:p.zona.trim(),lado:p.lado,sku_serv:p.serv||'',perforadora:$('perforadora').value})),
+    tatuajes:esTat()?S.tats.map(t=>({zona:t.zona.trim(),dimensiones:t.dimensiones.trim(),sku_serv:t.sku,tamano:servNom(t.sku),color:t.color,prueba:t.prueba,tipo:t.tipo,tatuadora:t.tatuadora})):[],
     autorizaciones:{consentimiento:true,datos_salud:true,fotos:S.fotos==='si',manual_whatsapp:S.manual==='si',
       pink:S.persona&&S.persona.pink?'ya_es':S.pink,aviso:S.pink==='si'&&$('pAviso').checked,marketing_wa:!!($('pMkt')&&$('pMkt').checked)},
     firma:{firmante:f.quien,nombre:f.nombre,png:firmaPNG()}};
@@ -862,9 +948,12 @@ function enviar(){
   const data=S.payload;
   const p=DEMO?new Promise(ok=>setTimeout(()=>{const id=data.persona.id_clienta||'NUE-0001';
       ok({id_clienta:id,id_consent:'CON-000001',nueva:!data.persona.id_clienta,pink_id:data.autorizaciones.pink==='si'?id:'',
-        perforaciones:data.perforaciones.map((p,i)=>({...p,id_perfo:'PER-00000'+(i+1)}))});},600))
+        perforaciones:data.perforaciones.map((p,i)=>({...p,id_perfo:'PER-00000'+(i+1)})),
+        tatuajes:data.tatuajes.map((t,i)=>({...t,id_tatuaje:'TTO-00000'+(i+1)}))});},600))
     :api('consent_guardar',data);
-  S.guardando=p.then(r=>{S.res={d:data,r};agregarALista(data,r);pedirPdf(r.id_consent,data.firma.png);},x=>{S.errGuardar=x;});
+  S.guardando=p.then(r=>{
+    if(data.servicio==='Tatuaje')r.perforaciones=(r.tatuajes||[]).map(t=>({id_perfo:t.id_tatuaje,sku_serv:t.sku_serv,zona:'Tatuaje en '+t.zona,lado:'Centro',perforadora:t.tatuadora}));
+    S.res={d:data,r};agregarALista(data,r);pedirPdf(r.id_consent,data.firma.png);},x=>{S.errGuardar=x;});
 }
 async function terminarGuardado(){
   const b=$('next');
@@ -912,12 +1001,12 @@ function listo(){
     <div class="ln"><span>ID de la clienta</span><span>${esc(r.id_clienta)}</span></div>
     <div class="ln"><span>Correo para la nota</span><span>${esc(p.email||'—')}</span></div>
     ${r.perforaciones.map(x=>`<div class="ln"><span>${esc(x.zona)}${x.lado==='Centro'?'':' '+esc(x.lado.toLowerCase())}<br><small style="color:var(--mu)">${esc(servNom(x.sku_serv))}</small></span><span>${servPrecio(x.sku_serv)!==''?'$'+servPrecio(x.sku_serv):'—'}</span></div>`).join('')}
-    <div class="pend">Falta elegir la pieza de cada perforación (del inventario).</div>`;
+    <div class="pend">${d.servicio==='Tatuaje'?'Se cobra cada tatuaje con su tamaño.':'Falta elegir la pieza de cada perforación (del inventario).'}</div>`;
   $('notaDemo').hidden=!DEMO;
   $('guardado').innerHTML=[
     [r.nueva?'Clienta nueva':'Clienta actualizada',r.id_clienta],
     ['Consentimiento',r.id_consent],
-    [r.perforaciones.length>1?`${r.perforaciones.length} perforaciones`:'1 perforación','Expediente'],
+    [d.servicio==='Tatuaje'?(r.perforaciones.length>1?`${r.perforaciones.length} tatuajes`:'1 tatuaje'):(r.perforaciones.length>1?`${r.perforaciones.length} perforaciones`:'1 perforación'),'Expediente'],
     ['PDF firmado','Drive · '+d.lugar],
     ...(d.autorizaciones.pink==='si'?[['Alta en el Pink Club',r.pink_id]]:[]),
   ].map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');
@@ -928,7 +1017,7 @@ function listo(){
   $('recordatorios').innerHTML=rec.map(([a,b])=>`<div><span>${esc(a)}</span><b>${fmt(b)}</b></div>`).join('')+
     `<p class="hint" style="margin:4px 0 0">Esa mañana aparece el WhatsApp listo para enviar. Si le ponen aros de silicón, el recordatorio de retiro (≈${CFG.dias.retiro} días) se programa solo desde la nota.</p>`;
   const wa=p.tutor?p.tutor.whatsapp:p.whatsapp;
-  const msg=`Hola ${p.apodo} 💗 Gracias por perforarte en Yiyi Pash. Aquí está tu manual de cuidados: ${CFG.manual} Cualquier duda escríbenos por aquí.`;
+  const msg=`Hola ${p.apodo} 💗 Gracias por tu visita a Yiyi Pash. Aquí está tu manual de cuidados: ${d.servicio==='Tatuaje'&&CFG.manual_tatuaje?CFG.manual_tatuaje:CFG.manual} Cualquier duda escríbenos por aquí.`;
   $('waBtn').href=`https://wa.me/52${wa}?text=${encodeURIComponent(msg)}`;
   $('waBtn').hidden=!d.autorizaciones.manual_whatsapp;
   pintarPdf();
@@ -963,7 +1052,7 @@ function documento(d,hoy){
 const _show=show;
 show=function(n){_show(n);if(n===9)listo();};
 function reiniciar(){
-  S.persona=null;S.detalle=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.manual=S.pink=null;S.fotos='si';S.firmaVacia=true;S.res=null;S.pdf=null;
+  S.persona=null;S.detalle=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.tats=[];S.servicio='Perforación';S.manual=S.pink=null;S.fotos='si';S.firmaVacia=true;S.res=null;S.pdf=null;
   document.querySelectorAll('input[type=text],input[type=tel],input[type=email],input[type=date],input[type=search],textarea').forEach(i=>i.value='');
   document.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
   $('sangre').value='';$('saludPrev').hidden=true;$('results').innerHTML='';
