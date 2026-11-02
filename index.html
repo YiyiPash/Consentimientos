@@ -2,30 +2,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Consentimiento Yiyi Pash</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Titan+One&display=swap">
 <style>
 /* Layout: una columna de celular (máx. 520px), un paso a la vez. Dos partes: Equipo (gris) y Clienta (rosa), con una pantalla de "pasa el celular" entre ellas. */
+/* Marca Yiyi Pash: rosa pastel de fondo, rosa fuerte para acentos, títulos Titan One con borde blanco, texto Montserrat. Siempre en claro. */
 :root{
-  --bg:#fdf2f8; --surface:#ffffff; --fg:#1f2937; --mu:#6b7280; --line:#fbcfe8;
-  --accent:#be185d; --accent2:#ec4899; --soft:#fce7f3; --on-accent:#ffffff;
-  --team:#334155; --team-soft:#e2e8f0;
-  --ok:#15803d; --ok-bg:#dcfce7; --bad:#b91c1c; --warn-bg:#fef3c7; --warn-fg:#92400e;
+  --bg:#ffe1ee; --surface:#ffffff; --fg:#3b1f2e; --mu:#7d5468; --line:#f8c4dc;
+  --accent:#d6347f; --accent2:#ff74af; --soft:#ffd3e6; --on-accent:#ffffff;
+  --team:#5b4a63; --team-soft:#ece6f2;
+  --ok:#15803d; --ok-bg:#dcfce7; --bad:#c0262d; --warn-bg:#fef3c7; --warn-fg:#92400e;
   --ink:#1f2937; --paper:#ffffff;
-  --font:'Poppins',system-ui,sans-serif;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#1a1217; --surface:#261a21; --fg:#f7e8f0; --mu:#bca5b2; --line:#4a2a3b;
-  --accent:#f472b6; --accent2:#ec4899; --soft:#3a1d2d; --on-accent:#ffffff;
-  --team:#cbd5e1; --team-soft:#2b3340;
-  --ok:#86efac; --ok-bg:#14301f; --bad:#fca5a5; --warn-bg:#3a2c0e; --warn-fg:#fcd34d;
-  color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --bg:#1a1217; --surface:#261a21; --fg:#f7e8f0; --mu:#bca5b2; --line:#4a2a3b;
-  --accent:#f472b6; --accent2:#ec4899; --soft:#3a1d2d; --on-accent:#ffffff;
-  --team:#cbd5e1; --team-soft:#2b3340;
-  --ok:#86efac; --ok-bg:#14301f; --bad:#fca5a5; --warn-bg:#3a2c0e; --warn-fg:#fcd34d;
-  color-scheme:dark;
+  --font:'Montserrat',system-ui,sans-serif; --title:'Titan One','Montserrat',system-ui,sans-serif;
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -35,7 +23,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .brand{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.logo{font-size:12px;font-weight:700;letter-spacing:4px;color:var(--accent)}
+.logo{display:block;height:46px;width:auto}
 .where{font-size:12px;color:var(--mu);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer;font-family:inherit}
 .demo{font-size:11px;font-weight:600;background:var(--warn-bg);color:var(--warn-fg);border-radius:999px;padding:2px 8px}
 .phase{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:999px;padding:3px 10px;margin-top:10px}
@@ -46,10 +34,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .bar i.on{background:var(--accent)}
 .bar i.team.on{background:var(--team)}
 .stepname{font-size:12px;color:var(--mu);margin-top:6px}
-h1{font-size:22px;font-weight:700;margin:6px 0 4px;text-wrap:balance}
+h1{font-family:var(--title);font-weight:400;font-size:26px;line-height:1.15;color:#e8509a;margin:8px 0 6px;text-wrap:balance;
+  -webkit-text-stroke:5px #fff;paint-order:stroke fill;text-shadow:3px 3px 0 #f7a9cc;letter-spacing:.3px}
 .hint{font-size:13.5px;color:var(--mu);margin:0 0 14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
-.card h2{font-size:14px;font-weight:600;color:var(--accent);margin:0}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;box-shadow:0 2px 0 #f8c4dc;padding:16px;display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.card h2{font-size:15px;font-weight:700;color:var(--accent);margin:0}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--mu);letter-spacing:.3px}
 label.f .opc{font-weight:400}
 input[type=text],input[type=tel],input[type=email],input[type=date],input[type=search],input[type=password],select,textarea{
@@ -60,13 +49,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)}
 .row>*{min-width:0}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 13px;font-family:inherit;font-size:14px;cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip[aria-pressed="true"]{background:var(--accent2);border-color:var(--accent2);color:var(--on-accent);font-weight:600}
 .chip.none[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--surface)}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
 .check input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex-shrink:0}
 .req{color:var(--accent);font-weight:700}
-.btn{display:block;width:100%;text-align:center;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--on-accent);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn{display:block;width:100%;text-align:center;padding:14px;border:none;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--on-accent);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
 .btn.sec{background:var(--surface);color:var(--accent);border:1.5px solid var(--line)}
 .btn.small{display:inline-block;width:auto;padding:8px 14px;font-size:14px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -97,7 +86,7 @@ footer.nav .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:
 /* Entrega del celular */
 .handoff{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
 .handoff .ico{width:84px;height:84px;border-radius:24px;background:var(--soft);display:grid;place-items:center;font-size:40px}
-.handoff h1{font-size:26px}
+.handoff h1{font-size:34px}
 details.leer{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
 details.leer summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:14px}
 details.leer div{font-size:13px;color:var(--fg);margin-top:8px;max-height:280px;overflow:auto}
@@ -154,6 +143,17 @@ label.check.bad{padding:6px}
 .acepta .si{color:var(--ok);font-weight:700}
 .acepta .no{color:var(--mu);font-weight:700}
 .pdfwait{opacity:.6;pointer-events:none}
+.leerbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.leerbtns .btn{padding:12px 8px;font-size:14px}
+.lector{position:fixed;inset:0;z-index:40;background:rgba(59,31,46,.45);display:flex;align-items:flex-end;justify-content:center}
+.lector-in{background:var(--surface);width:100%;max-width:560px;height:92vh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;gap:10px;
+  padding:16px 16px calc(14px + env(safe-area-inset-bottom,0px))}
+.lector-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.lector-h h2{margin:0;font-family:var(--title);font-weight:400;font-size:20px;color:var(--accent)}
+.lector-txt{flex:1;overflow:auto;font-size:14px;line-height:1.55;border-top:1px solid var(--line);padding-top:10px;overscroll-behavior:contain}
+.lector-txt ul,.lector-txt ol{padding-left:20px}
+.lector-txt li{margin-bottom:6px}
+.lector-txt h3{font-size:15px;color:var(--accent);margin:14px 0 4px}
 @media (max-width:380px){.row{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){.step{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
 </style>
@@ -162,7 +162,7 @@ label.check.bad{padding:6px}
 <div class="app">
   <header class="top">
     <div class="brand">
-      <span class="logo">YIYI PASH</span>
+      <img class="logo" alt="Yiyi Pash" src="data:image/png;base64,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">
       <span style="display:flex;gap:6px;align-items:center">
         <span class="demo" id="demoTag" hidden>DEMO</span>
         <button class="where" id="whereBtn" type="button"></button>
@@ -266,10 +266,14 @@ label.check.bad{padding:6px}
   <section class="step" data-step="6" data-part="client" data-name="Tus permisos">
     <h1>Tus permisos</h1>
     <p class="hint">Cada uno se acepta por separado.</p>
-    <details class="leer"><summary>Leer el consentimiento completo</summary><div id="textoConsent"></div></details>
+    <div class="leerbtns">
+      <button class="btn sec" type="button" data-leer="consent">📄 Leer el consentimiento</button>
+      <button class="btn sec" type="button" data-leer="aviso">🔒 Aviso de privacidad</button>
+    </div>
+    <div id="textoConsent" hidden></div>
     <div class="card" style="margin-top:12px">
       <label class="check"><input type="checkbox" id="aLeido"><span><span class="req">*</span> Leí el consentimiento, me aclararon mis dudas y acepto el procedimiento.</span></label>
-      <label class="check"><input type="checkbox" id="aSalud"><span><span class="req">*</span> Autorizo que Yiyi Pash use mis datos de salud solo para mi seguridad durante y después de la perforación.</span></label>
+      <label class="check"><input type="checkbox" id="aSalud"><span><span class="req">*</span> Autorizo que Yiyi Pash use mis datos de salud solo para mi seguridad durante y después de la perforación, como dice el <a href="#" data-leer="aviso">aviso de privacidad</a>.</span></label>
     </div>
     <div class="card">
       <h2>¿Podemos publicar fotos de tu perforación en redes?</h2>
@@ -341,6 +345,14 @@ label.check.bad{padding:6px}
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<!-- Lector: consentimiento, aviso y términos, dentro del formulario para no perder lo llenado -->
+<div class="lector" id="lector" hidden>
+  <div class="lector-in" role="dialog" aria-modal="true" aria-labelledby="lectorTit">
+    <div class="lector-h"><h2 id="lectorTit"></h2><button class="btn small" type="button" id="lectorCerrar">Cerrar</button></div>
+    <div class="lector-txt" id="lectorTxt"></div>
+    <button class="btn" type="button" id="lectorListo">Listo, ya lo leí</button>
+  </div>
+</div>
 
 <footer class="nav"><div class="in">
   <button class="btn sec" type="button" id="back">Atrás</button>
@@ -357,7 +369,7 @@ const CFG={
   manual:'https://drive.google.com/drive/folders/1OQgdBLqUJ-0H-Aib08YtvjkkbQwQ59TX?usp=drive_link',
   lugares:['Yiyipash Studio','Peace & Love Stores','Casa OKO','Peace & Love Market','Catarsis Bazar'],
   equipo:[{id:'ART-001',alias:'Yiyi'},{id:'STA-001',alias:'Luis'},{id:'',alias:'Cam'},{id:'ART-003',alias:'Kat'}],
-  perforadoras:[{id:'ART-001',alias:'Yiyi'},{id:'ART-003',alias:'Kat'}],
+  perforadoras:[{id:'ART-001',alias:'Yiyi',nombre:'Yoltic Yarel Ballesteros Bravo'},{id:'ART-003',alias:'Kat',nombre:'Katia Ximena Lopez Pacheco'}],
   enfermedades:['Ansiedad','Dermatitis','Hipertensión','Presión baja','Diabetes','Resistencia a la insulina','Hipotiroidismo','Cicatrización queloide','Problemas de coagulación','Anemia','Epilepsia','Lupus'],
   condiciones:['Embarazo','Lactancia','Tratamiento inmunodepresivo (radioterapia, quimioterapia)','Tomo anticoagulantes','Enfermedad infecciosa, fiebre o gripe'],
   fobias:['Sangre','Agujas (cánulas o catéteres)','Tijeras o pinzas'],
@@ -703,16 +715,55 @@ chips('cond',CFG.condiciones,'cond','Ninguna');
 chips('fob',CFG.fobias,'fob','Ninguno');
 
 // ── Paso 6: permisos ─────────────────────────────────────────────────
+// Indicaciones y material: vienen del servidor (consent_config). Esto es solo para la demo.
 $('textoConsent').innerHTML=`<b>Indicaciones previas</b><ul>
 <li>No estar bajo los efectos de drogas o alcohol al momento del procedimiento.</li>
-<li>No haber consumido alcohol, drogas o anticoagulantes (como aspirina o ibuprofeno) en las 6 horas previas.</li>
-<li>Si la persona es menor de edad, el consentimiento lo firma su madre, padre o tutor legal, quien autoriza y supervisa el procedimiento.</li>
-<li>Acudir en buenas condiciones de salud y habiendo comido, para evitar mareos o desmayos.</li>
-<li>No se puede realizar si hay enfermedad infecciosa, fiebre, gripe o alguna condición que comprometa el sistema inmunológico.</li>
-<li>Informar cualquier condición médica preexistente o tratamiento médico.</li></ul>
-<b>Material</b><ul><li>Cánula o catéter nuevo, sellado y estéril; pieza desinfectada y estéril; guantes nuevos y estériles; paquete de limpieza nuevo y sellado; instrumental desinfectado y estéril.</li></ul>
-<b>Declaración</b><p>Declaro, en pleno uso de mis facultades, que conozco el procedimiento, que se aclararon mis dudas y que se me explicaron el proceso, los cuidados y los posibles riesgos (infección, rechazo o cicatrización irregular). Se me mostró el material nuevo, sellado y estéril, de uso personal, que será desechado. Me comprometo a seguir las indicaciones de higiene y cuidados. Entiendo que Yiyi Pash y la perforadora no son responsables de complicaciones posteriores, y que ante dudas durante la curación debo contactar a Yiyi Pash.</p>
-<p>Mis datos se tratan según el aviso de privacidad de Yiyi Pash (yiyipash.github.io/pink/aviso.html).</p>`;
+<li>No haber consumido alcohol, drogas o sustancias anticoagulantes (como aspirina, ibuprofeno, entre otros) en las últimas 6 horas previas al procedimiento.</li>
+<li>En caso de que la persona que se realizará la perforación sea menor de edad, el consentimiento deberá ser llenado y firmado por su madre, padre o tutor legal, quien otorgará su autorización, confirmará y supervisará que el procedimiento se llevó a cabo de manera adecuada.</li>
+<li>Acudir a la cita en óptimas condiciones de salud, habiendo ingerido alimentos previamente para evitar mareos, desmayos u otros malestares durante el procedimiento.</li>
+<li>No se podrá realizar el procedimiento si se padece alguna enfermedad infecciosa, fiebre, gripe o alguna condición que comprometa el sistema inmunológico.</li>
+<li>Informar si padece alguna condición médica preexistente (diabetes, problemas de coagulación, enfermedades de la piel, etc.).</li>
+<li>En caso de estar bajo tratamiento médico, informar previamente a la perforadora para revisar si se puede realizar el procedimiento.</li></ul>
+<b>Identificación de los productos a utilizar en el procedimiento</b><ul><li>Cánula o catéter nuevo, sellado y estéril.</li><li>Pieza desinfectada y estéril.</li><li>Guantes nuevos y estériles.</li><li>Paquete de limpieza nuevo, sellado y estéril.</li><li>Instrumental quirúrgico desinfectado y estéril.</li></ul>`;
+const DATOS_TXT='Los datos personales proporcionados en este documento serán tratados de manera confidencial y utilizados exclusivamente para los fines relacionados con la realización del procedimiento, según el aviso de privacidad de Yiyi Pash. No serán compartidos con terceros sin el consentimiento del titular, salvo en los casos previstos por la ley. Al firmar este documento, el titular o su tutor legal acepta el tratamiento de sus datos bajo estas condiciones.';
+// Declaración para mayores o para menores (aprobada por Luis el 27/10). Copia de consTextos() en Consentimiento.gs: si cambias una, cambia la otra.
+function declaracion(){
+  const e=edad($('fn').value),menor=e!==null&&e<18,nombre=$('nombre').value.trim(),apodo=$('apodo').value.trim();
+  const al=$('perforadora').value,pf=CFG.perforadoras.find(x=>x.alias===al);
+  const perfo=!al||al==='Otra persona'?'la perforadora':'la perforadora '+((pf&&pf.nombre)||al);
+  const riesgos='Se me explicaron el proceso, los cuidados necesarios y los posibles riesgos, como infección, rechazo o cicatrización irregular.';
+  const material='Confirmo que se me mostró el material nuevo, sellado y estéril, de uso personal, que será desechado después.';
+  const resp=`Entiendo y acepto que Yiyi Pash y ${perfo} no son responsables de complicaciones posteriores. Ante cualquier duda durante la curación, contactaré a Yiyi Pash.`;
+  const fotos=S.fotos==='si'?'Autorizo':'No autorizo';
+  if(menor){const t=$('tnombre').value.trim(),par=$('tpar').value.trim().toLowerCase();
+    return{d1:`Yo, ${t}, en mi calidad de ${par} y tutor(a) legal de ${nombre}, de ${e} años, en pleno uso de mis facultades, autorizo que se le realice la perforación descrita en este documento. Declaro que conozco el procedimiento. Expresé mis dudas y me fueron aclaradas. ${riesgos}`,
+      d2:`${material} Estaré presente durante el procedimiento y me comprometo a vigilar que ${apodo||nombre} siga las indicaciones de higiene y cuidados. ${resp}`,
+      fotos:`${fotos} que Yiyi Pash publique fotos y videos de la perforación de ${nombre} en sus redes sociales.`};}
+  return{d1:`Yo, ${nombre}, en pleno uso de mis facultades, declaro que conozco el procedimiento al que me someteré. Expresé mis dudas y me fueron aclaradas. ${riesgos}`,
+    d2:`${material} Me comprometo a seguir las indicaciones de higiene y cuidados. ${resp}`,
+    fotos:`${fotos} que Yiyi Pash publique fotos y videos de mi perforación en sus redes sociales.`};
+}
+function consentHTML(){const d=declaracion();
+  return `${$('textoConsent').innerHTML}<b>Declaración</b><p>${esc(d.d1)}</p><p>${esc(d.d2)}</p>${S.fotos?`<p><b>${esc(d.fotos)}</b></p>`:''}<p><i>${esc(DATOS_TXT)}</i></p>`;}
+// Lector dentro del formulario. El aviso y los términos se leen de la página pública del Pink Club (mismo sitio).
+const LECTOR={consent:['Consentimiento',null],aviso:['Aviso de privacidad','/pink/aviso.html'],terminos:['Términos del Pink Club','/pink/terminos.html']};
+async function abrirLector(k){
+  const [tit,url]=LECTOR[k];
+  $('lectorTit').textContent=tit;$('lector').hidden=false;$('lectorTxt').scrollTop=0;
+  if(!url){$('lectorTxt').innerHTML=consentHTML();return;}
+  $('lectorTxt').innerHTML='<p class="hint">Cargando…</p>';
+  try{
+    const r=await fetch(url);if(!r.ok)throw new Error(r.status);
+    const doc=new DOMParser().parseFromString(await r.text(),'text/html'),sec=doc.querySelector('.legal')||doc.querySelector('main')||doc.body;
+    sec.querySelectorAll('.volver,script,style,link').forEach(x=>x.remove());
+    $('lectorTxt').innerHTML=sec.innerHTML;
+  }catch(x){
+    $('lectorTxt').innerHTML=`<p>No pude cargarlo aquí. <a href="https://yiyipash.github.io${url}" target="_blank" rel="noopener">Ábrelo en otra pestaña</a>.</p>`;
+  }
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-leer]');if(!b)return;e.preventDefault();abrirLector(b.dataset.leer);});
+const cerrarLector=()=>$('lector').hidden=true;
+$('lectorCerrar').onclick=cerrarLector;$('lectorListo').onclick=cerrarLector;
 function seg(id,key){$(id).querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;$(id).querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));if(key==='pink')renderPinkExtra();});}
 seg('segFotos','fotos');seg('segManual','manual');
 function renderPink(){
@@ -732,7 +783,7 @@ function renderPinkExtra(){
   const box=$('pinkExtra');if(!box)return;
   const e=edad($('fn').value);
   box.innerHTML=S.pink==='si'?`<div style="display:flex;flex-direction:column;gap:10px">
-    <label class="check"><input type="checkbox" id="pAviso"><span><span class="req">*</span> Acepto el <a href="https://yiyipash.github.io/pink/aviso.html" target="_blank" rel="noopener">aviso de privacidad</a> y los <a href="https://yiyipash.github.io/pink/terminos.html" target="_blank" rel="noopener">términos del Pink Club</a>.</span></label>
+    <label class="check"><input type="checkbox" id="pAviso"><span><span class="req">*</span> Acepto el <a href="#" data-leer="aviso">aviso de privacidad</a> y los <a href="#" data-leer="terminos">términos del Pink Club</a>.</span></label>
     ${e!==null&&e>=18?'<label class="check"><input type="checkbox" id="pMkt"><span>Quiero recibir promociones por WhatsApp.</span></label>':''}</div>`:'';
 }
 
@@ -905,12 +956,8 @@ function documento(d,hoy){
     <tr><td class="sec" colspan="3">En caso de ser menor de edad</td></tr>
     <tr><td>Tutor: ${esc(t?t.nombre:'-')}</td><td>Parentesco: ${esc(t?t.parentesco:'-')}</td><td>Teléfono: ${esc(t?t.whatsapp:'-')}</td></tr>
   </table>
-  ${$('textoConsent').innerHTML}
-  <div class="marca">
-    <span>☑ Acepto el procedimiento y el uso de mis datos de salud para mi seguridad.</span>
-    <span>${d.autorizaciones.fotos?'☑ Autorizo':'☐ No autorizo'} la publicación de fotos de mi perforación en redes sociales.</span>
-  </div>
-  <div class="firma"><img src="${d.firma.png}" alt="Firma"><div class="ln">${esc(d.firma.nombre)}${d.firma.firmante==='Tutor'?' (tutor)':''}</div></div>`;
+  ${consentHTML()}
+  <div class="firma"><img src="${d.firma.png}" alt="Firma"><div class="ln">${esc(d.firma.nombre)}${d.firma.firmante==='Tutor'?` · ${esc(t.parentesco)} y tutor(a) de ${esc(p.nombre_completo)}`:''}</div></div>`;
 }
 const _show=show;
 show=function(n){_show(n);if(n===9)listo();};
