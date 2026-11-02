@@ -274,10 +274,10 @@ label.check.bad{padding:6px}
     <div class="card" style="margin-top:12px">
       <label class="check"><input type="checkbox" id="aLeido"><span><span class="req">*</span> Leí el consentimiento, me aclararon mis dudas y acepto el procedimiento.</span></label>
       <label class="check"><input type="checkbox" id="aSalud"><span><span class="req">*</span> Autorizo que Yiyi Pash use mis datos de salud solo para mi seguridad durante y después de la perforación, como dice el <a href="#" data-leer="aviso">aviso de privacidad</a>.</span></label>
+      <!-- Fotos: junto con los demás permisos y ya marcada (Luis, 02/11); es voluntaria: se quita la palomita si no quiere -->
+      <label class="check"><input type="checkbox" id="aFotos" checked><span>Autorizo que Yiyi Pash publique fotos y videos de mi perforación en sus redes sociales. <span class="opc" style="color:var(--mu)">(Es opcional: si no quieres, quita la palomita.)</span></span></label>
     </div>
     <div class="card">
-      <h2>¿Podemos publicar fotos de tu perforación en redes?</h2>
-      <div class="seg" id="segFotos"><button class="chip" type="button" data-v="si">Sí</button><button class="chip" type="button" data-v="no">No</button></div>
       <h2>¿Te mandamos el manual de cuidados por WhatsApp?</h2>
       <div class="seg" id="segManual"><button class="chip" type="button" data-v="si">Sí</button><button class="chip" type="button" data-v="no">No</button></div>
     </div>
@@ -403,7 +403,7 @@ const DEMO_PERSONAS=[
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dig=s=>String(s||'').replace(/\D/g,'');
-const S={step:0,persona:null,salud:{enf:[],cond:[],fob:[]},perfos:[],fotos:null,manual:null,pink:null,firmaVacia:true,res:null};
+const S={step:0,persona:null,salud:{enf:[],cond:[],fob:[]},perfos:[],fotos:'si',manual:null,pink:null,firmaVacia:true,res:null};
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const steps=[...document.querySelectorAll('.step')];
 const LAST=steps.length-1;
@@ -538,7 +538,6 @@ function validar(n){
   if(n===6){
     if(!$('aLeido').checked)return F('Falta aceptar el consentimiento (es obligatorio).','aLeido');
     if(!$('aSalud').checked)return F('Falta autorizar el uso de tus datos de salud (es obligatorio).','aSalud');
-    if(!S.fotos)return F('Falta contestar lo de las fotos.','segFotos');
     if(!S.manual)return F('Falta contestar lo del manual de cuidados.','segManual');
     if(!(S.persona&&S.persona.pink)&&!S.pink)return F('Falta contestar si quieres unirte al Pink Club.','pinkCard');
     if(S.pink==='si'&&!$('pAviso').checked)return F('Para el Pink Club debes aceptar el aviso de privacidad y los términos.','pAviso');
@@ -765,7 +764,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-leer]');if
 const cerrarLector=()=>$('lector').hidden=true;
 $('lectorCerrar').onclick=cerrarLector;$('lectorListo').onclick=cerrarLector;
 function seg(id,key){$(id).querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;$(id).querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));if(key==='pink')renderPinkExtra();});}
-seg('segFotos','fotos');seg('segManual','manual');
+seg('segManual','manual');
+$('aFotos').onchange=()=>{S.fotos=$('aFotos').checked?'si':'no';};
 function renderPink(){
   const p=S.persona;
   if(p&&p.pink){
@@ -962,11 +962,12 @@ function documento(d,hoy){
 const _show=show;
 show=function(n){_show(n);if(n===9)listo();};
 function reiniciar(){
-  S.persona=null;S.detalle=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.fotos=S.manual=S.pink=null;S.firmaVacia=true;S.res=null;S.pdf=null;
+  S.persona=null;S.detalle=null;S.salud={enf:[],cond:[],fob:[]};S.perfos=[];S.manual=S.pink=null;S.fotos='si';S.firmaVacia=true;S.res=null;S.pdf=null;
   document.querySelectorAll('input[type=text],input[type=tel],input[type=email],input[type=date],input[type=search],textarea').forEach(i=>i.value='');
   document.querySelectorAll('input[type=checkbox]').forEach(i=>i.checked=false);
   $('sangre').value='';$('saludPrev').hidden=true;$('results').innerHTML='';
-  document.querySelectorAll('#segFotos .chip,#segManual .chip').forEach(b=>b.setAttribute('aria-pressed','false'));
+  $('aFotos').checked=true;
+  document.querySelectorAll('#segManual .chip').forEach(b=>b.setAttribute('aria-pressed','false'));
   $('perforadora').value=S.perfoAuto||'';
   pintarChips();ctx.clearRect(0,0,cv.width,cv.height);$('sigph').hidden=false;show(1);
 }
