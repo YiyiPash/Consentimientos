@@ -146,6 +146,7 @@ function ficha(f){
   if(!ningun(f.alergias))alertas.push('Alergia: '+f.alergias);
   if(!ningun(f.medicamentos))alertas.push('Toma: '+f.medicamentos);
   const miedos=lista(f.fobias);
+  const viejo=/^Migrado/.test(f.origen||'');                   // consentimientos del Form viejo: no preguntaba alergias ni medicamentos
   const perfs=f.perforaciones.map(p=>`<div><span>${esc(p.zona)}${p.lado&&p.lado!=='Centro'?' '+esc(p.lado.toLowerCase()):''}</span><span>${esc(p.perforadora||'')}</span></div>`).join('');
   return `<article class="card">
     <div class="top">
@@ -160,7 +161,9 @@ function ficha(f){
     </div>
     <div class="perfos">${perfs||'<div><span>Sin zona registrada</span><span></span></div>'}</div>
     ${alertas.length?`<div class="salud"><b>⚠️ Revisa antes de perforar</b><ul>${alertas.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`
+      :viejo?`<div class="miedo">Sin enfermedades registradas. <b>Formato anterior:</b> no se preguntó por alergias, medicamentos ni tipo de sangre; pregúntaselo.</div>`
       :`<div class="salud ok"><b>✓ Sin enfermedades, alergias ni medicamentos</b></div>`}
+    ${alertas.length&&viejo?`<div class="miedo"><b>Formato anterior:</b> no se preguntó por alergias, medicamentos ni tipo de sangre; pregúntaselo.</div>`:''}
     ${miedos.length?`<div class="miedo">😰 Le da miedo: ${esc(miedos.join(', '))}. Explícale cada paso con calma.</div>`:''}
     ${f.comentarios?`<div class="nota"><b>Comentario:</b> ${esc(f.comentarios)}</div>`:''}
     ${f.notas_equipo?`<div class="nota"><b>Nota del equipo:</b> ${esc(f.notas_equipo)}</div>`:''}
