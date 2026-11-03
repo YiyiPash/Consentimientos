@@ -373,7 +373,7 @@ label.check.bad{padding:6px}
 // Lo de aquí abajo es solo para la demo.
 const CFG={
   url:'https://script.google.com/macros/s/AKfycbwJhAO5anQhZ_tzZ7f6jSE133AxFzSLU2rXkVH1vdtH9SlkMlbnvdjbez3786HIEhAf/exec',
-  notas:'https://yiyipash.github.io/Notas_digitales/',
+  notas:'/Notas_digitales/',
   manual:'https://drive.google.com/drive/folders/1OQgdBLqUJ-0H-Aib08YtvjkkbQwQ59TX?usp=drive_link',
   lugares:['Yiyipash Studio','Peace & Love Stores','Casa OKO','Peace & Love Market','Catarsis Bazar'],
   equipo:[{id:'ART-001',alias:'Yiyi'},{id:'STA-001',alias:'Luis'},{id:'',alias:'Cam'},{id:'ART-003',alias:'Kat'}],
@@ -401,7 +401,7 @@ const CFG={
 };
 CFG.tamanos.forEach(x=>CFG.servicios[x.sku]=[x.nombre,x.precio]);
 // Demo fuera de GitHub (por ejemplo, la vista previa) o con ?demo en la liga
-const DEMO=!/\.github\.io$/.test(location.hostname)||/[?&]demo/.test(location.search);
+const DEMO=!/(\.github\.io|(^|\.)yiyipash\.com)$/.test(location.hostname)||/[?&]demo/.test(location.search);
 // Datos de ejemplo para el modo demo. En producción vienen del servidor.
 const DEMO_PERSONAS=[
   {id:'LUI-0001',apodo:'Luis',nombre:'Luis Enrique Lopez Pacheco',fn:'2002-08-16',wa:'5547061079',email:'luiselp0216@gmail.com',pink:{estado:'Registrada',puntos:0},ultima:null},
@@ -842,7 +842,7 @@ async function abrirLector(k){
     sec.querySelectorAll('.volver,script,style,link').forEach(x=>x.remove());
     $('lectorTxt').innerHTML=sec.innerHTML;
   }catch(x){
-    $('lectorTxt').innerHTML=`<p>No pude cargarlo aquí. <a href="https://yiyipash.github.io${url}" target="_blank" rel="noopener">Ábrelo en otra pestaña</a>.</p>`;
+    $('lectorTxt').innerHTML=`<p>No pude cargarlo aquí. <a href="${url}" target="_blank" rel="noopener">Ábrelo en otra pestaña</a>.</p>`;
   }
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-leer]');if(!b)return;e.preventDefault();abrirLector(b.dataset.leer);});

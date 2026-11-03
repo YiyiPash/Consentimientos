@@ -142,7 +142,7 @@ h1{font-family:var(--title);font-weight:400;font-size:26px;line-height:1.15;colo
 <script>
 const URL_API='https://script.google.com/macros/s/AKfycbwJhAO5anQhZ_tzZ7f6jSE133AxFzSLU2rXkVH1vdtH9SlkMlbnvdjbez3786HIEhAf/exec';
 // Demo fuera de GitHub (o con ?demo): datos inventados, no se conecta.
-const DEMO=!/\.github\.io$/.test(location.hostname)||/[?&]demo/.test(location.search);
+const DEMO=!/(\.github\.io|(^|\.)yiyipash\.com)$/.test(location.hostname)||/[?&]demo/.test(location.search);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
