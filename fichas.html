@@ -292,8 +292,8 @@ function pintarExp(){
       +(miedos.length?`<div class="miedo" style="margin-top:6px">😰 Le da miedo: ${esc(miedos.join(', '))}</div>`:'')
       +`<p class="estado">Según su consentimiento del ${esc(fmtF(ult.fecha))}${ult.sangre?' · Sangre '+esc(ult.sangre):''}</p>`;
   }
-  const tats=(d.tatuajes||[]).map(x=>`<div class="perfo"><span>🖋️ ${esc(x.zona)}<small>${esc(fmtF(x.fecha))}${x.tatuadora?' · '+esc(x.tatuadora):''} · ${esc([x.dimensiones,x.color,x.tipo].filter(Boolean).join(' · '))}${x.prueba?' · alergia: '+esc(x.prueba):''}</small></span><span class="est ${esc(x.estado)}">${esc(x.estado||'—')}</span></div>`).join('');
-  const perfos=d.perforaciones.map(x=>`<div class="perfo"><span>${esc(zonaTxt(x))}<small>${esc(fmtF(x.fecha))}${x.perforadora?' · '+esc(x.perforadora):''}</small></span><span class="est ${esc(x.estado)}">${esc(x.estado||'—')}</span></div>`).join('')||'<p class="estado">Sin perforaciones registradas.</p>';
+  const tats=(d.tatuajes||[]).map(x=>`<div class="perfo"><span>🖋️ ${esc(x.zona)}<small>${esc(fmtF(x.fecha))}${x.tatuadora?' · '+esc(x.tatuadora):''} · ${esc([x.dimensiones,x.color,x.tipo].filter(Boolean).join(' · '))}${x.prueba?' · alergia: '+esc(x.prueba):''}${x.no_nota?' · Nota '+esc(x.no_nota):''}</small></span><span class="est ${esc(x.estado)}">${esc(x.estado||'—')}</span></div>`).join('');
+  const perfos=d.perforaciones.map(x=>`<div class="perfo"><span>${esc(zonaTxt(x))}<small>${esc(fmtF(x.fecha))}${x.perforadora?' · '+esc(x.perforadora):''}${x.no_nota?' · Nota '+esc(x.no_nota):''}</small></span><span class="est ${esc(x.estado)}">${esc(x.estado||'—')}</span></div>`).join('')||'<p class="estado">Sin perforaciones registradas.</p>';
   // Línea de tiempo: consentimientos y visitas, lo más nuevo arriba
   const todos=[...d.perforaciones,...(d.tatuajes||[]).map(t=>({...t,zona:'Tatuaje en '+t.zona,lado:''}))];
   const zonas=ids=>ids.split(',').map(s=>s.trim()).map(i=>todos.find(x=>x.id===i)).filter(Boolean).map(zonaTxt).join(', ');

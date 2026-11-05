@@ -952,7 +952,7 @@ function enviar(){
         tatuajes:data.tatuajes.map((t,i)=>({...t,id_tatuaje:'TTO-00000'+(i+1)}))});},600))
     :api('consent_guardar',data);
   S.guardando=p.then(r=>{
-    if(data.servicio==='Tatuaje')r.perforaciones=(r.tatuajes||[]).map(t=>({id_perfo:t.id_tatuaje,sku_serv:t.sku_serv,zona:'Tatuaje en '+t.zona,lado:'Centro',perforadora:t.tatuadora}));
+    if(data.servicio==='Tatuaje')r.perforaciones=(r.tatuajes||[]).map(t=>({id_perfo:t.id_tatuaje,sku_serv:t.sku_serv,zona:'Tatuaje en '+t.zona,lado:'Centro',perforadora:t.tatuadora,tipo:t.tipo}));
     S.res={d:data,r};agregarALista(data,r);pedirPdf(r.id_consent,data.firma.png);},x=>{S.errGuardar=x;});
 }
 async function terminarGuardado(){
@@ -1027,7 +1027,7 @@ function listo(){
 $('btnNota').onclick=()=>{
   const {d,r}=S.res;
   store.set('yp_handoff',JSON.stringify({desde:'consentimiento',id_consent:r.id_consent,id_clienta:r.id_clienta,
-    apodo:d.persona.apodo,email:d.persona.email,perforaciones:r.perforaciones.map(x=>({id_perfo:x.id_perfo,sku_serv:x.sku_serv,zona:x.zona,lado:x.lado}))}));
+    apodo:d.persona.apodo,email:d.persona.email,servicio:d.servicio,perforaciones:r.perforaciones.map(x=>({id_perfo:x.id_perfo,sku_serv:x.sku_serv,zona:x.zona,lado:x.lado,perforadora:x.perforadora,tipo:x.tipo}))}));
   if(!DEMO)location.href=CFG.notas+'?desde=consentimiento';
   else $('notaDemo').scrollIntoView({behavior:'smooth',block:'center'});
 };
