@@ -53,7 +53,7 @@ label{display:grid;gap:4px;font-size:13px;font-weight:600}
   <h1>Panel de notas</h1>
 
   <section id="vLista" class="lista">
-    <label for="q">Buscar nota<input type="search" id="q" placeholder="Número, nombre o correo" autocomplete="off"></label>
+    <label for="q">Buscar en las notas de hoy<input type="search" id="q" placeholder="Número, nombre o correo" autocomplete="off"></label>
     <p class="err" id="eLista" hidden></p>
     <p class="mu" id="estado"></p>
     <div class="lista" id="notas"></div>
@@ -63,8 +63,7 @@ label{display:grid;gap:4px;font-size:13px;font-weight:600}
     <p class="ok" id="aviso" hidden></p>
     <div class="card" id="resumen"></div>
     <form class="card" id="fCorregir">
-      <h2 id="tCorregir">Corregir</h2>
-      <p class="mu" id="soloHoy" style="margin:0" hidden>Solo se corrigen notas del día. Esta nota ya no se puede cambiar, pero sí reenviar.</p>
+      <h2>Corregir</h2>
       <label for="nombre">Nombre<input id="nombre" autocomplete="off"></label>
       <label for="correos">Correos de la nota<input id="correos" autocomplete="off" inputmode="email" placeholder="Si son varios, sepáralos con coma"></label>
       <label for="manual">Correos del manual<input id="manual" autocomplete="off" inputmode="email" placeholder="Si son varios, sepáralos con coma"></label>
@@ -106,7 +105,7 @@ async function buscar(){
   try{
     const d=await api('consent_nota_buscar',{q:$('q').value.trim()});
     if(mio!==turno)return;
-    $('estado').textContent=d.notas.length?($('q').value.trim()?'':'Últimas notas'):'No encontré notas con esa búsqueda.';
+    $('estado').textContent=d.notas.length?($('q').value.trim()?'':'Notas de hoy'):($('q').value.trim()?'No encontré notas de hoy con esa búsqueda.':'Hoy todavía no hay notas.');
     $('notas').innerHTML=d.notas.map(n=>'<button class="nota" type="button" data-id="'+esc(n.id)+'"><span><b>'+esc(n.id)+' · '+esc(n.nombre)+'</b><small>'+esc(fechaTxt(n.fecha))+' · '+esc(n.lugar)+'</small></span><span class="der">'+(n.estado==='Anulada'?'<span class="pill">Anulada</span>':esc(dinero(n.total)))+'</span></button>').join('');
   }catch(x){if(mio===turno){$('estado').textContent='';error('eLista',x.message);}}
 }
@@ -123,7 +122,6 @@ function pintar(n,msg){
     +n.pagos.map(p=>'<div class="fila"><span>'+esc(p.tipo)+'</span><span>'+esc(dinero(p.monto))+'</span></div>').join('')
     +(n.comentarios&&n.comentarios!=='-'?'<p class="mu" style="margin:0">'+esc(n.comentarios)+'</p>':'');
   $('fCorregir').hidden=anulada;$('fAnular').hidden=anulada||!/^D-/.test(n.id);
-  $('tCorregir').textContent=n.de_hoy?'Corregir':'Correos';$('soloHoy').hidden=n.de_hoy;$('bGuardar').hidden=!n.de_hoy;['nombre','correos','manual'].forEach(i=>{$(i).readOnly=!n.de_hoy;});
   $('nombre').value=n.nombre;$('correos').value=n.emails_nota;$('manual').value=n.emails_manual;
   if(!$('por').value)$('por').value=leer('yp_elaboro_alias');
   $('motivo').value='';$('claveD').value='';error('eCorregir','');error('eAnular','');
