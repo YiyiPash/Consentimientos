@@ -150,6 +150,7 @@ $('f').onsubmit=async e=>{
   }catch(x){error('eForm',x.message);$('claveD').value='';}
   $('bGuardar').disabled=false;
 };
+if(leer('yp_pink_clave'))cargarLista().catch(()=>{});   // la lista ya está lista cuando empiezan a escribir
 </script>
 </body>
 </html>

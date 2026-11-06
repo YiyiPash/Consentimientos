@@ -433,10 +433,19 @@ async function api(action,data){
   if(!j.ok){if(/Clave de equipo/i.test(j.error||'')){try{localStorage.removeItem('yp_pink_clave')}catch(e){}}throw new Error(j.error||'Error del servidor');}
   return j.data;
 }
+// Abre al momento con las últimas listas de este celular; las nuevas llegan por detrás y las reemplazan
 async function cargarConfig(){
-  const res=await fetch(CFG.url+'?action=consent_config',{redirect:'follow'});
-  const j=await res.json();if(!j.ok)throw new Error(j.error||'No pude cargar las listas');
-  const c=j.data;
+  let guardada=null;
+  try{guardada=JSON.parse(store.get('yp_cache_config')||'null');}catch(e){}
+  const pedido=fetch(CFG.url+'?action=consent_config',{redirect:'follow'}).then(r=>r.json()).then(j=>{
+    if(!j.ok)throw new Error(j.error||'No pude cargar las listas');
+    store.set('yp_cache_config',JSON.stringify(j.data));
+    usarConfig(j.data);
+  });
+  if(guardada){usarConfig(guardada);pedido.catch(()=>{});return;}
+  await pedido;
+}
+function usarConfig(c){
   CFG.lugares=c.lugares;CFG.equipo=c.equipo;CFG.perforadoras=c.perforadoras;CFG.manual=c.manual;CFG.dias.seguimiento=c.dias.seguimiento;
   CFG.zonas=c.zonas.map(z=>({z:z.z,g:z.grupo,serv:z.serv,lados:z.lados||undefined}));
   CFG.servicios={};c.servicios.forEach(x=>CFG.servicios[x.sku]=[x.nombre,x.precio]);
